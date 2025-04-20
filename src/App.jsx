@@ -218,7 +218,6 @@ function App() {
                     <MenuItem
                       value={m.id}
                       key={m.id}
-                      disabled={!isFree && !hasPaidAccess}
                     >
                       <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
                         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
