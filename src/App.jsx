@@ -8,6 +8,13 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000/t
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
 const FAVORITES_KEY = 'favorite_models_v1';
 
+const PAID_MODELS_PASSWORD = "letmein123"; // Change this to your desired password
+
+// Helper to check if a model is free based on its name
+function isFreeModel(model) {
+  return model.name && /\bfree\b/i.test(model.name);
+}
+
 function App() {
   const [prompt, setPrompt] = useState('');
   const [model, setModel] = useState('openai/gpt-4');
@@ -20,6 +27,7 @@ function App() {
   const [error, setError] = useState('');
   const [selectedModelDetails, setSelectedModelDetails] = useState(null);
   const [favorites, setFavorites] = useState([]);
+  const [hasPaidAccess, setHasPaidAccess] = useState(false);
 
   // Load favorites from localStorage
   useEffect(() => {
@@ -53,8 +61,18 @@ function App() {
           ...m
         }));
         chatModels.sort((a, b) => a.id.localeCompare(b.id));
+        console.log("Available models:", chatModels.map(m => m.name));
         setModels(chatModels);
-        if (chatModels.length > 0) setModel(chatModels[0].id);
+        if (chatModels.length > 0) {
+          // Prefer Gemini 2.5 Pro Experimental (free) if present
+          const gemini = chatModels.find(m => m.name && m.name.toLowerCase().includes('gemini 2.5 pro experimental'));
+          if (gemini) {
+            setModel(gemini.id);
+          } else {
+            const firstFree = chatModels.find(isFreeModel);
+            setModel(firstFree ? firstFree.id : chatModels[0].id);
+          }
+        }
       } catch (err) {
         setModelsError('Could not load models. Showing defaults.');
         setModels([
@@ -79,10 +97,15 @@ function App() {
     setFavorites(favs => favs.includes(id) ? favs.filter(f => f !== id) : [...favs, id]);
   };
 
+  // Only show paid models if password is entered
+  const visibleModels = hasPaidAccess
+    ? models
+    : models.filter(isFreeModel);
+
   // Sort: favorites at top, then alphabetical
   const sortedModels = [
-    ...models.filter(m => favorites.includes(m.id)),
-    ...models.filter(m => !favorites.includes(m.id))
+    ...visibleModels.filter(m => favorites.includes(m.id)),
+    ...visibleModels.filter(m => !favorites.includes(m.id))
   ];
 
   // Placeholder for file upload
@@ -135,7 +158,22 @@ function App() {
           ) : (
             <Select
               value={model}
-              onChange={e => setModel(e.target.value)}
+              onChange={e => {
+                const selected = e.target.value;
+                const selectedModel = models.find(m => m.id === selected);
+                if (selectedModel && !isFreeModel(selectedModel) && !hasPaidAccess) {
+                  const pw = window.prompt("Enter password for paid models:");
+                  if (pw === PAID_MODELS_PASSWORD) {
+                    setHasPaidAccess(true);
+                    setModel(selected);
+                  } else {
+                    alert("Incorrect password.");
+                    return;
+                  }
+                } else {
+                  setModel(selected);
+                }
+              }}
               size="small"
               sx={{ minWidth: 340, background: '#fff' }}
               MenuProps={{ PaperProps: { style: { maxHeight: 350 } } }}
