@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import CosmicBackground from './CosmicBackground';
+
 import { Container, Typography, Paper, Box, Button, TextField, Select, MenuItem, Divider, List, ListItem, ListItemText, CircularProgress, Alert, IconButton, Tooltip } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
@@ -28,6 +30,8 @@ function App() {
   const [selectedModelDetails, setSelectedModelDetails] = useState(null);
   const [favorites, setFavorites] = useState([]);
   const [hasPaidAccess, setHasPaidAccess] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef(null);
 
   // Load favorites from localStorage
   useEffect(() => {
@@ -97,15 +101,10 @@ function App() {
     setFavorites(favs => favs.includes(id) ? favs.filter(f => f !== id) : [...favs, id]);
   };
 
-  // Only show paid models if password is entered
-  const visibleModels = hasPaidAccess
-    ? models
-    : models.filter(isFreeModel);
-
-  // Sort: favorites at top, then alphabetical
+  // Show all models, but only allow selection of free ones unless hasPaidAccess
   const sortedModels = [
-    ...visibleModels.filter(m => favorites.includes(m.id)),
-    ...visibleModels.filter(m => !favorites.includes(m.id))
+    ...models.filter(m => favorites.includes(m.id)),
+    ...models.filter(m => !favorites.includes(m.id))
   ];
 
   // Placeholder for file upload
@@ -113,10 +112,29 @@ function App() {
     alert('File upload is not implemented yet.');
   };
 
-  // Placeholder for speech input
+  // Speech-to-text input
   const handleSpeechInput = () => {
-    alert('Speech input is not implemented yet.');
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      alert('Speech recognition not supported in this browser.');
+      return;
+    }
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!recognitionRef.current) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.lang = 'en-US';
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setPrompt(prev => prev ? prev + ' ' + transcript : transcript);
+        setIsListening(false);
+      };
+      recognitionRef.current.onerror = () => setIsListening(false);
+      recognitionRef.current.onend = () => setIsListening(false);
+    }
+    setIsListening(true);
+    recognitionRef.current.start();
   };
+
 
   const handleSend = async () => {
     if (!prompt) return;
@@ -149,9 +167,23 @@ function App() {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 6 }}>
-      <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
-        <Typography variant="h4" gutterBottom>OllieiQ App</Typography>
+    <>
+      <CosmicBackground />
+      <Container maxWidth="sm" sx={{ mt: 6, position: 'relative', zIndex: 1 }}>
+        <div className="header-glass" style={{ padding: '32px 0 18px 0', marginBottom: 18, borderBottom: '2px solid var(--vp-accent)', boxShadow: '0 2px 8px rgba(143,156,255,0.09)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Typography variant="h3" align="center" style={{ fontWeight: 900, letterSpacing: 1, color: 'var(--vp-accent)', marginBottom: 0, textShadow: '0 2px 12px #181C20' }}>
+            Sphere1a
+          </Typography>
+        </div>
+        <div className="glass" style={{ marginBottom: 18, padding: 18 }}>
+          <Box sx={{ display: 'flex', gap: 2, mb: 1, alignItems: 'center' }}>
+            <Typography variant="subtitle2" sx={{ color: '#5BC0EB', fontWeight: 700, fontSize: 16, mr: 2 }}>
+              Model:
+            </Typography>
+            {modelsLoading ? (
+              <CircularProgress size={20} sx={{ color: '#5BC0EB', mr: 2 }} />
+            ) : null}
+          </Box>
         <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
           {modelsLoading ? (
             <CircularProgress size={22} sx={{ color: '#00bcd4', mr: 2 }} />
@@ -162,7 +194,7 @@ function App() {
                 const selected = e.target.value;
                 const selectedModel = models.find(m => m.id === selected);
                 if (selectedModel && !isFreeModel(selectedModel) && !hasPaidAccess) {
-                  const pw = window.prompt("Enter password for paid models:");
+                  const pw = window.prompt("Enter password for exclusive models:");
                   if (pw === PAID_MODELS_PASSWORD) {
                     setHasPaidAccess(true);
                     setModel(selected);
@@ -180,34 +212,44 @@ function App() {
             >
               {sortedModels.length === 0 ? (
                 <MenuItem disabled>No models found</MenuItem>
-              ) : sortedModels.map(m => (
-                <MenuItem value={m.id} key={m.id}>
-                  <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
-                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                      <span style={{ fontWeight: 600 }}>{m.name}</span>
-                      <span style={{ fontSize: 12, color: '#666' }}>{m.provider} &mdash; ctx: {m.context_length || '?'} tokens</span>
-                    </Box>
-                    <Tooltip title={favorites.includes(m.id) ? 'Unfavorite' : 'Favorite'}>
-                      <IconButton size="small" onClick={e => { e.stopPropagation(); toggleFavorite(m.id); }}>
-                        {favorites.includes(m.id) ? <StarIcon sx={{ color: '#FFD600' }} /> : <StarBorderIcon />}
-                      </IconButton>
-                    </Tooltip>
-                  </Box>
-                </MenuItem>
-              ))}
+              ) : sortedModels.map(m => {
+                  const isFree = isFreeModel(m);
+                  return (
+                    <MenuItem
+                      value={m.id}
+                      key={m.id}
+                      disabled={!isFree && !hasPaidAccess}
+                    >
+                      <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
+                        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                          <span style={{ fontWeight: 600 }}>{m.name}</span>
+                          <span style={{ fontSize: 12, color: '#666' }}>{m.provider} &mdash; ctx: {m.context_length || '?'} tokens</span>
+                          {!isFree && !hasPaidAccess && (
+                            <span style={{ color: '#c00', fontSize: 11 }}>Exclusive – Unlock with Pro</span>
+                          )}
+                        </Box>
+                        <Tooltip title={favorites.includes(m.id) ? 'Unfavorite' : 'Favorite'}>
+                          <IconButton size="small" onClick={e => { e.stopPropagation(); toggleFavorite(m.id); }}>
+                            {favorites.includes(m.id) ? <StarIcon sx={{ color: '#FFD600' }} /> : <StarBorderIcon />}
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </MenuItem>
+                  );
+                })}
             </Select>
           )}
         </Box>
         {modelsError && <Typography variant="caption" color="error" sx={{ ml: 2 }}>{modelsError}</Typography>}
         {/* Model Details */}
         {selectedModelDetails && (
-          <Box sx={{ mb: 2, textAlign: 'left', background: '#f4f4f4', borderRadius: 2, p: 2 }}>
-            <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{selectedModelDetails.name}</Typography>
+          <Box sx={{ mb: 2, textAlign: 'left', background: 'rgba(36,29,63,0.7)', borderRadius: 12, p: 2 }}>
+            <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#00fff7' }}>{selectedModelDetails.name}</Typography>
             <Typography variant="caption" color="text.secondary">
               Provider: {selectedModelDetails.provider} | Context Window: {selectedModelDetails.context_length || '?'} tokens
             </Typography>
             {selectedModelDetails.description && (
-              <Typography variant="body2" sx={{ mt: 1 }}>{selectedModelDetails.description}</Typography>
+              <Typography variant="body2" sx={{ mt: 1, color: '#fff' }}>{selectedModelDetails.description}</Typography>
             )}
           </Box>
         )}
@@ -216,44 +258,59 @@ function App() {
             fullWidth
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
-            label="Ask something..."
+            label={isListening ? "Listening..." : "Ask something..."}
             disabled={loading}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+            sx={{ background: '#221b3a', borderRadius: 2, input: { color: '#fff' }, label: { color: '#00fff7' } }}
           />
-          <Button onClick={handleFileUpload} variant="outlined">File</Button>
-          <Button onClick={handleSpeechInput} variant="outlined">🎤</Button>
-          <Button onClick={handleSend} variant="contained" endIcon={<SendIcon />} disabled={loading || !prompt || modelsLoading}>Send</Button>
+          <Button onClick={handleFileUpload} variant="outlined" className="glow-btn">File</Button>
+          <Button onClick={handleSpeechInput} variant={isListening ? "contained" : "outlined"} className="glow-btn" style={{ background: isListening ? '#49a09d' : undefined }}>
+            🎤
+          </Button>
+          <Button onClick={handleSend} className="glow-btn" endIcon={<SendIcon />} disabled={loading || !prompt || modelsLoading}>Send</Button>
         </Box>
         {loading && <CircularProgress sx={{ mt: 2 }} />}
         {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
+        {/* Chat bubbles for response */}
         {response && (
-          <Paper elevation={1} sx={{ mt: 2, p: 2, background: '#f8f8f8' }}>
-            <Typography variant="subtitle1" color="secondary" fontWeight={700}>AI Response</Typography>
-            <Divider sx={{ my: 1 }} />
-            <Typography variant="body1" sx={{ whiteSpace: 'pre-line', fontFamily: 'Fira Mono, monospace' }}>{response}</Typography>
-          </Paper>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end', marginTop: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <div className="chat-bubble user" style={{ padding: '8px 14px', fontSize: 15 }}>{prompt}</div>
+              <img src="https://api.dicebear.com/7.x/personas/svg?seed=user" alt="user" style={{ width: 28, height: 28, borderRadius: '50%', background: '#e5eaf1', border: '1px solid #b6c9d7' }} />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <img src="https://api.dicebear.com/7.x/bottts/svg?seed=ai" alt="ai" style={{ width: 28, height: 28, borderRadius: '50%', background: '#232a34', border: '1px solid #5bc0eb' }} />
+              <div className="chat-bubble ai" style={{ padding: '8px 14px', fontSize: 15 }}>{response}</div>
+            </div>
+          </div>
         )}
-      </Paper>
-      <Paper elevation={2} sx={{ mt: 4, p: 2 }}>
-        <Typography variant="h6" gutterBottom>Request History</Typography>
-        <Divider sx={{ mb: 1 }} />
-        <List>
+      </div>
+      <div className="glass" style={{ marginTop: 18, marginBottom: 18, padding: 14 }}>
+        <Typography variant="subtitle2" gutterBottom sx={{ color: '#5BC0EB', fontWeight: 700, fontSize: 15 }}>Request History</Typography>
+        <Divider sx={{ mb: 1, background: '#5BC0EB' }} />
+        <List dense>
           {history.length === 0 && <ListItem><ListItemText primary="No history yet." /></ListItem>}
           {history.map((item, idx) => (
-            <ListItem key={idx} alignItems="flex-start">
-              <ListItemText
-                primary={item.prompt}
-                secondary={<>
-                  <Typography component="span" variant="caption" color="text.secondary">{item.model} | {item.timestamp}</Typography><br />
-                  <Typography component="span" variant="body2">{item.response}</Typography>
-                </>}
-              />
+            <ListItem key={idx} alignItems="flex-start" sx={{ py: 0.5 }}>
+              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <div className="chat-bubble user" style={{ padding: '6px 10px', fontSize: 14 }}>{item.prompt}</div>
+                  <img src="https://api.dicebear.com/7.x/personas/svg?seed=user" alt="user" style={{ width: 22, height: 22, borderRadius: '50%', background: '#e5eaf1', border: '1px solid #b6c9d7' }} />
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <img src="https://api.dicebear.com/7.x/bottts/svg?seed=ai" alt="ai" style={{ width: 22, height: 22, borderRadius: '50%', background: '#232a34', border: '1px solid #5bc0eb' }} />
+                  <div className="chat-bubble ai" style={{ padding: '6px 10px', fontSize: 14 }}>{item.response}</div>
+                </div>
+                <Typography component="span" variant="caption" color="#5BC0EB">{item.model} | {item.timestamp}</Typography>
+              </div>
             </ListItem>
           ))}
         </List>
-      </Paper>
+      </div>
     </Container>
+  </>
   );
 }
+
 
 export default App;
