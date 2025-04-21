@@ -169,7 +169,28 @@ function App() {
   return (
     <>
       <CosmicBackground />
-      <Container maxWidth="sm" sx={{ mt: 6, position: 'relative', zIndex: 1 }}>
+      <Container
+  maxWidth={false}
+  sx={{
+    width: '95vw',
+    height: '95vh',
+    minHeight: '95vh',
+    minWidth: '95vw',
+    margin: 'auto',
+    position: 'relative',
+    zIndex: 1,
+    border: '3px solid #8F9CFF', // prominent border
+    borderRadius: 8,
+    background: 'rgba(24,27,38,0.96)',
+    boxShadow: '0 0 32px 0 #8F9CFF33',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-start',
+    alignItems: 'stretch',
+    padding: 5,
+    gap: 4,
+  }}
+>
         <div className="header-glass" style={{ padding: '32px 0 18px 0', marginBottom: 18, borderBottom: '2px solid var(--vp-accent)', boxShadow: '0 2px 8px rgba(143,156,255,0.09)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Typography variant="h3" align="center" style={{ fontWeight: 900, letterSpacing: 1, color: 'var(--vp-accent)', marginBottom: 0, textShadow: '0 2px 12px #181C20' }}>
             Sphere1a
