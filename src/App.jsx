@@ -191,11 +191,7 @@ function App() {
     gap: 4,
   }}
 >
-        <div className="header-glass" style={{ padding: '32px 0 18px 0', marginBottom: 18, borderBottom: '2px solid var(--vp-accent)', boxShadow: '0 2px 8px rgba(143,156,255,0.09)', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Typography variant="h3" align="center" style={{ fontWeight: 900, letterSpacing: 1, color: 'var(--vp-accent)', marginBottom: 0, textShadow: '0 2px 12px #181C20' }}>
-            Sphere1a
-          </Typography>
-        </div>
+
         <div className="glass" style={{ marginBottom: 18, padding: 18 }}>
           <Box sx={{ display: 'flex', gap: 2, mb: 1, alignItems: 'center' }}>
             <Typography variant="subtitle2" sx={{ color: '#5BC0EB', fontWeight: 700, fontSize: 16, mr: 2 }}>
