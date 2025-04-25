@@ -288,7 +288,7 @@ function App() {
               input: { color: '#fff', caretColor: '#fff', '::placeholder': { color: '#fff', opacity: 1 } },
               label: { color: '#fff' },
               '& .MuiInputBase-input': { color: '#fff' },
-              '& .MuiInputLabel-root': { color: '#fff' },
+              '& .MuiInputLabel-root': { color: '#fff' }
             },
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
