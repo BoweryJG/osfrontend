@@ -171,28 +171,37 @@ function App() {
       <CosmicBackground />
       <Container
   maxWidth={false}
+  disableGutters
   sx={{
-    width: '95vw',
-    height: '95vh',
-    minHeight: '95vh',
-    minWidth: '95vw',
-    margin: 'auto',
+    width: '100vw',
+    height: '100vh',
+    margin: 0,
     position: 'relative',
     zIndex: 1,
-    border: '3px solid #8F9CFF', // prominent border
-    borderRadius: 8,
-    background: 'rgba(24,27,38,0.96)',
-    boxShadow: '0 0 32px 0 #8F9CFF33',
+    border: 'none',
+    borderRadius: 0,
+    background: 'none',
+    boxShadow: 'none',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
     alignItems: 'stretch',
-    padding: 5,
-    gap: 4,
+    padding: 0,
+    gap: 0,
   }}
 >
 
-        <div className="glass" style={{ marginBottom: 18, padding: 18 }}>
+        <div className="glass" style={{
+  width: '100vw',
+  height: '100vh',
+  margin: 0,
+  padding: 0,
+  borderRadius: 0,
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'flex-start',
+  alignItems: 'stretch',
+}}>
           <Box sx={{ display: 'flex', gap: 2, mb: 1, alignItems: 'center' }}>
             <Typography variant="subtitle2" sx={{ color: '#5BC0EB', fontWeight: 700, fontSize: 16, mr: 2 }}>
               Model:
@@ -269,9 +278,18 @@ function App() {
             )}
           </Box>
         )}
-        <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+        <Box sx={{ display: 'flex', gap: 1, mb: 2, width: '100%' }}>
           <TextField
             fullWidth
+            sx={{
+              width: '100%',
+              background: '#221b3a',
+              borderRadius: 2,
+              input: { color: '#fff', caretColor: '#fff', '::placeholder': { color: '#fff', opacity: 1 } },
+              label: { color: '#fff' },
+              '& .MuiInputBase-input': { color: '#fff' },
+              '& .MuiInputLabel-root': { color: '#fff' },
+            },
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
             label={isListening ? "Listening..." : "Ask something..."}
@@ -296,7 +314,7 @@ function App() {
         {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
         {/* Chat bubbles for response */}
         {response && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end', marginTop: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'flex-end', marginTop: 12, width: '100%' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <div className="chat-bubble user" style={{ padding: '8px 14px', fontSize: 15 }}>{prompt}</div>
               <img src="https://api.dicebear.com/7.x/personas/svg?seed=user" alt="user" style={{ width: 28, height: 28, borderRadius: '50%', background: '#e5eaf1', border: '1px solid #b6c9d7' }} />
@@ -308,10 +326,15 @@ function App() {
           </div>
         )}
       </div>
-      <div className="glass" style={{ marginTop: 18, marginBottom: 18, padding: 14 }}>
+      <div className="glass" style={{
+  width: '100vw',
+  margin: 0,
+  padding: 0,
+  borderRadius: 0,
+}}>
         <Typography variant="subtitle2" gutterBottom sx={{ color: '#5BC0EB', fontWeight: 700, fontSize: 15 }}>Request History</Typography>
         <Divider sx={{ mb: 1, background: '#5BC0EB' }} />
-        <List dense>
+        <List dense sx={{ width: '100%' }}>
           {history.length === 0 && <ListItem><ListItemText primary="No history yet." /></ListItem>}
           {history.map((item, idx) => (
             <ListItem key={idx} alignItems="flex-start" sx={{ py: 0.5 }}>
