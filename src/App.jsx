@@ -289,20 +289,12 @@ function App() {
               label: { color: '#fff' },
               '& .MuiInputBase-input': { color: '#fff' },
               '& .MuiInputLabel-root': { color: '#fff' }
-            },
+            }}
             value={prompt}
             onChange={e => setPrompt(e.target.value)}
             label={isListening ? "Listening..." : "Ask something..."}
             disabled={loading}
             onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-            sx={{
-              background: '#221b3a',
-              borderRadius: 2,
-              input: { color: '#fff', caretColor: '#fff', '::placeholder': { color: '#fff', opacity: 1 } },
-              label: { color: '#fff' },
-              '& .MuiInputBase-input': { color: '#fff' },
-              '& .MuiInputLabel-root': { color: '#fff' },
-            }}
           />
           <Button onClick={handleFileUpload} variant="outlined" className="glow-btn">File</Button>
           <Button onClick={handleSpeechInput} variant={isListening ? "contained" : "outlined"} className="glow-btn" style={{ background: isListening ? '#49a09d' : undefined }}>
