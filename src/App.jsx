@@ -202,6 +202,19 @@ function App() {
   justifyContent: 'flex-start',
   alignItems: 'stretch',
 }}>
+          <Typography variant="h3" sx={{
+            color: '#fff',
+            fontWeight: 900,
+            fontSize: { xs: 32, sm: 40, md: 48 },
+            textAlign: 'center',
+            letterSpacing: 2,
+            mt: 4,
+            mb: 2,
+            textShadow: '0 2px 16px #23263a, 0 1px 2px #5BC0EB44',
+            fontFamily: 'Montserrat, Roboto, Arial, sans-serif'
+          }}>
+            Sphere oS
+          </Typography>
           <Box sx={{ display: 'flex', gap: 2, mb: 1, alignItems: 'center' }}>
             <Typography variant="subtitle2" sx={{ color: '#5BC0EB', fontWeight: 700, fontSize: 16, mr: 2 }}>
               Model:
