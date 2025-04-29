@@ -9,12 +9,26 @@ import SendIcon from '@mui/icons-material/Send';
 const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/task';
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
 const FAVORITES_KEY = 'favorite_models_v1';
+const AUTH_STATUS_KEY = 'auth_status_v1';
 
-const PAID_MODELS_PASSWORD = "letmein123"; // Change this to your desired password
-
-// Helper to check if a model is free based on its name
+// Helper to check if a model is free based on its ID - aligned with backend logic
 function isFreeModel(model) {
-  return model.name && /\bfree\b/i.test(model.name);
+  if (!model || !model.id) return false;
+  
+  // List of free models or patterns that identify free models - same as backend
+  const freeModels = [
+    'google/gemini-pro',
+    'google/gemini-1.5-pro',
+    'google/gemini-2.5-pro',
+    'anthropic/claude-instant',
+    'mistralai/mistral',
+    'meta-llama/llama-2'
+  ];
+  
+  // Check if the model ID contains any of the free model patterns
+  return freeModels.some(freeModel => 
+    model.id.toLowerCase().includes(freeModel.toLowerCase())
+  );
 }
 
 function App() {
@@ -37,6 +51,43 @@ function App() {
   useEffect(() => {
     const favs = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
     setFavorites(Array.isArray(favs) ? favs : []);
+    
+    // Check authentication status
+    const checkAuthStatus = async () => {
+      try {
+        // Try to fetch a simple endpoint that requires authentication
+        const authCheckUrl = `${BACKEND_URL.split('/task')[0]}/auth/status`;
+        const res = await fetch(authCheckUrl, {
+          credentials: 'include' // Include cookies for session authentication
+        });
+        
+        if (res.ok) {
+          const data = await res.json();
+          if (data.authenticated) {
+            setHasPaidAccess(true);
+            localStorage.setItem(AUTH_STATUS_KEY, JSON.stringify({
+              authenticated: true,
+              timestamp: Date.now()
+            }));
+          }
+        }
+      } catch (err) {
+        console.log('Auth check failed, assuming not authenticated:', err);
+        // If the auth check fails, we assume the user is not authenticated
+        // This is a silent failure, so we don't show an error to the user
+      }
+    };
+    
+    // Check if we have a recent auth status in localStorage
+    const storedAuthStatus = JSON.parse(localStorage.getItem(AUTH_STATUS_KEY) || '{}');
+    const isRecent = storedAuthStatus.timestamp && (Date.now() - storedAuthStatus.timestamp < 3600000); // 1 hour
+    
+    if (storedAuthStatus.authenticated && isRecent) {
+      setHasPaidAccess(true);
+    } else {
+      // If no recent auth status, check with the server
+      checkAuthStatus();
+    }
   }, []);
 
   // Save favorites to localStorage
@@ -145,9 +196,45 @@ function App() {
       const res = await fetch(BACKEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, model })
+        body: JSON.stringify({ prompt, model }),
+        credentials: 'include' // Include cookies for session authentication
       });
+      
+      // Handle 403 Forbidden (authentication required)
+      if (res.status === 403) {
+        const data = await res.json();
+        
+        // If this is a paid model that requires authentication
+        if (data.error === 'Authentication required for this model') {
+          setError('This model requires authentication. Please log in to use premium models.');
+          
+          // Redirect to login page
+          const loginUrl = `${BACKEND_URL.split('/task')[0]}/auth/google`;
+          
+          if (confirm('This model requires a subscription. Would you like to log in?')) {
+            window.location.href = loginUrl;
+            return;
+          } else {
+            // If user cancels, suggest using a free model
+            const selectedModel = models.find(m => m.id === model);
+            if (selectedModel && !isFreeModel(selectedModel)) {
+              const freeModel = models.find(isFreeModel);
+              if (freeModel) {
+                if (confirm(`Would you like to use ${freeModel.name} instead? It's free!`)) {
+                  setModel(freeModel.id);
+                  setLoading(false);
+                  return;
+                }
+              }
+            }
+          }
+          setLoading(false);
+          return;
+        }
+      }
+      
       if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+      
       const data = await res.json();
       let aiResponse = '';
       if (data.success && data.llmResult && data.llmResult.choices && data.llmResult.choices.length > 0) {
@@ -157,6 +244,13 @@ function App() {
       } else {
         aiResponse = 'No response';
       }
+      
+      // If we got a successful response with a paid model, user must be authenticated
+      const selectedModel = models.find(m => m.id === model);
+      if (selectedModel && !isFreeModel(selectedModel)) {
+        setHasPaidAccess(true);
+      }
+      
       setResponse(aiResponse);
       setHistory([{ prompt, response: aiResponse, model, timestamp: new Date().toLocaleString() }, ...history]);
       setPrompt('');
@@ -231,19 +325,7 @@ function App() {
               value={model}
               onChange={e => {
                 const selected = e.target.value;
-                const selectedModel = models.find(m => m.id === selected);
-                if (selectedModel && !isFreeModel(selectedModel) && !hasPaidAccess) {
-                  const pw = window.prompt("Enter password for exclusive models:");
-                  if (pw === PAID_MODELS_PASSWORD) {
-                    setHasPaidAccess(true);
-                    setModel(selected);
-                  } else {
-                    alert("Incorrect password.");
-                    return;
-                  }
-                } else {
-                  setModel(selected);
-                }
+                setModel(selected);
               }}
               size="small"
               sx={{ minWidth: 340, background: '#fff' }}
