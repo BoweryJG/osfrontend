@@ -226,46 +226,43 @@ function App() {
       });
       
       if (res.ok) {
-        // Verify that the authentication was successful by checking the auth status
-        const authCheckUrl = `${BACKEND_URL.split('/task')[0]}/auth/status`;
-        const authRes = await fetch(authCheckUrl, {
-          credentials: 'include'
-        });
+        const data = await res.json();
         
-        if (authRes.ok) {
-          const authData = await authRes.json();
+        if (data.success) {
+          console.log('Authentication successful:', data);
           
-          if (authData.authenticated) {
-            console.log('Authentication successful:', authData);
-            setHasPaidAccess(true);
-            setShowPasswordModal(false);
-            setError(''); // Clear any previous error messages
-            
-            // If we have a pending prompt, send it now
-            if (pendingPrompt && pendingModel) {
-              const savedPrompt = pendingPrompt;
-              const savedModel = pendingModel;
-              
-              // Clear pending data
-              setPendingPrompt('');
-              setPendingModel('');
-              
-              // Reset the password field
-              setPassword('');
-              
-              // Send the pending prompt
-              await sendPrompt(savedPrompt, savedModel);
-            } else {
-              setLoading(false);
-            }
-            return;
-          } else {
-            console.error('Authentication failed: Session not set properly');
-            setPasswordError('Authentication failed. Please try again.');
+          // Store the token in localStorage for backup authentication
+          if (data.token) {
+            localStorage.setItem('auth_token', data.token);
+            console.log('Auth token saved to localStorage');
           }
+          
+          // Set the authenticated state
+          setHasPaidAccess(true);
+          setShowPasswordModal(false);
+          setError(''); // Clear any previous error messages
+          
+          // If we have a pending prompt, send it now
+          if (pendingPrompt && pendingModel) {
+            const savedPrompt = pendingPrompt;
+            const savedModel = pendingModel;
+            
+            // Clear pending data
+            setPendingPrompt('');
+            setPendingModel('');
+            
+            // Reset the password field
+            setPassword('');
+            
+            // Send the pending prompt with the token
+            await sendPrompt(savedPrompt, savedModel, data.token);
+          } else {
+            setLoading(false);
+          }
+          return;
         } else {
-          console.error('Failed to verify authentication status');
-          setPasswordError('Failed to verify authentication. Please try again.');
+          console.error('Authentication failed: Server returned success=false');
+          setPasswordError('Authentication failed. Please try again.');
         }
       } else {
         setPasswordError('Invalid password. Please try again.');
@@ -279,16 +276,23 @@ function App() {
   };
 
   // Send prompt to backend
-  const sendPrompt = async (promptText, modelId) => {
+  const sendPrompt = async (promptText, modelId, authToken) => {
     setLoading(true);
     setResponse('');
     setError('');
     
     try {
+      // Get token from localStorage if not provided
+      const token = authToken || localStorage.getItem('auth_token') || 'letmein123';
+      
       const res = await fetch(BACKEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt: promptText, model: modelId }),
+        body: JSON.stringify({ 
+          prompt: promptText, 
+          model: modelId,
+          token: token
+        }),
         credentials: 'include' // Include cookies for session authentication
       });
       
