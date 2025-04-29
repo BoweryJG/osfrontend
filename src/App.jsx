@@ -10,6 +10,7 @@ const BACKEND_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/task'
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
 const FAVORITES_KEY = 'favorite_models_v1';
 const AUTH_STATUS_KEY = 'auth_status_v1';
+const ADMIN_EMAIL = 'Jasonwilliamgolden@gmail.com'; // Admin email for subscription upgrade requests
 
 // Helper to check if a model is free based on its ID - aligned with backend logic
 function isFreeModel(model) {
@@ -47,33 +48,47 @@ function App() {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
 
-  // Load favorites from localStorage
+  // State for subscription level
+  const [subscriptionLevel, setSubscriptionLevel] = useState('free');
+  
+  // Load favorites from localStorage and check auth/subscription status
   useEffect(() => {
     const favs = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
     setFavorites(Array.isArray(favs) ? favs : []);
     
-    // Check authentication status
-    const checkAuthStatus = async () => {
+    // Check authentication and subscription status
+    const checkStatus = async () => {
       try {
-        // Try to fetch a simple endpoint that requires authentication
+        // Try to fetch the auth status endpoint
         const authCheckUrl = `${BACKEND_URL.split('/task')[0]}/auth/status`;
-        const res = await fetch(authCheckUrl, {
+        const authRes = await fetch(authCheckUrl, {
           credentials: 'include' // Include cookies for session authentication
         });
         
-        if (res.ok) {
-          const data = await res.json();
-          if (data.authenticated) {
+        if (authRes.ok) {
+          const authData = await authRes.json();
+          if (authData.authenticated) {
             setHasPaidAccess(true);
             localStorage.setItem(AUTH_STATUS_KEY, JSON.stringify({
               authenticated: true,
               timestamp: Date.now()
             }));
+            
+            // If authenticated, also check subscription level
+            const subscriptionUrl = `${BACKEND_URL.split('/task')[0]}/auth/subscription`;
+            const subRes = await fetch(subscriptionUrl, {
+              credentials: 'include'
+            });
+            
+            if (subRes.ok) {
+              const subData = await subRes.json();
+              setSubscriptionLevel(subData.subscription);
+              console.log(`User subscription level: ${subData.subscription}`);
+            }
           }
         }
       } catch (err) {
-        console.log('Auth check failed, assuming not authenticated:', err);
-        // If the auth check fails, we assume the user is not authenticated
+        console.log('Status check failed:', err);
         // This is a silent failure, so we don't show an error to the user
       }
     };
@@ -84,10 +99,10 @@ function App() {
     
     if (storedAuthStatus.authenticated && isRecent) {
       setHasPaidAccess(true);
-    } else {
-      // If no recent auth status, check with the server
-      checkAuthStatus();
     }
+    
+    // Always check with the server for the latest status
+    checkStatus();
   }, []);
 
   // Save favorites to localStorage
@@ -200,7 +215,7 @@ function App() {
         credentials: 'include' // Include cookies for session authentication
       });
       
-      // Handle 403 Forbidden (authentication required)
+      // Handle 403 Forbidden (authentication or subscription required)
       if (res.status === 403) {
         const data = await res.json();
         
@@ -211,7 +226,7 @@ function App() {
           // Redirect to login page
           const loginUrl = `${BACKEND_URL.split('/task')[0]}/auth/google`;
           
-          if (confirm('This model requires a subscription. Would you like to log in?')) {
+          if (confirm('This model requires authentication. Would you like to log in?')) {
             window.location.href = loginUrl;
             return;
           } else {
@@ -225,6 +240,36 @@ function App() {
                   setLoading(false);
                   return;
                 }
+              }
+            }
+          }
+          setLoading(false);
+          return;
+        }
+        
+        // If user is authenticated but needs a higher subscription level
+        if (data.error === 'Subscription required for this model') {
+          setError(data.response || 'Your subscription level does not include access to this model.');
+          
+          // Show subscription upgrade message
+          if (confirm('This model requires a higher subscription level. Would you like to contact the administrator to upgrade?')) {
+            // Open email to admin
+            window.location.href = `mailto:${ADMIN_EMAIL || 'admin@example.com'}?subject=Subscription%20Upgrade%20Request&body=I%20would%20like%20to%20upgrade%20my%20subscription%20to%20access%20more%20models.%20My%20current%20level%20is%20${subscriptionLevel}.`;
+            return;
+          } else {
+            // If user cancels, suggest using a model they have access to
+            const accessibleModels = models.filter(m => {
+              if (isFreeModel(m)) return true;
+              if (subscriptionLevel === 'asm' && m.id.toLowerCase().match(/(phi|claude-instant|mistral-medium|gemini-1\.5-flash)/)) return true;
+              return false;
+            });
+            
+            if (accessibleModels.length > 0) {
+              const suggestedModel = accessibleModels[0];
+              if (confirm(`Would you like to use ${suggestedModel.name} instead? It's available with your ${subscriptionLevel.toUpperCase()} subscription.`)) {
+                setModel(suggestedModel.id);
+                setLoading(false);
+                return;
               }
             }
           }
