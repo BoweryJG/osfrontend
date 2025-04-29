@@ -217,6 +217,7 @@ function App() {
     setLoading(true);
     
     try {
+      // Submit the password
       const res = await fetch(`${BACKEND_URL.split('/task')[0]}/auth/password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -225,34 +226,56 @@ function App() {
       });
       
       if (res.ok) {
-        setHasPaidAccess(true);
-        setShowPasswordModal(false);
+        // Verify that the authentication was successful by checking the auth status
+        const authCheckUrl = `${BACKEND_URL.split('/task')[0]}/auth/status`;
+        const authRes = await fetch(authCheckUrl, {
+          credentials: 'include'
+        });
         
-        // If we have a pending prompt, send it now
-        if (pendingPrompt && pendingModel) {
-          const savedPrompt = pendingPrompt;
-          const savedModel = pendingModel;
+        if (authRes.ok) {
+          const authData = await authRes.json();
           
-          // Clear pending data
-          setPendingPrompt('');
-          setPendingModel('');
-          
-          // Reset the password field
-          setPassword('');
-          
-          // Send the pending prompt
-          await sendPrompt(savedPrompt, savedModel);
+          if (authData.authenticated) {
+            console.log('Authentication successful:', authData);
+            setHasPaidAccess(true);
+            setShowPasswordModal(false);
+            setError(''); // Clear any previous error messages
+            
+            // If we have a pending prompt, send it now
+            if (pendingPrompt && pendingModel) {
+              const savedPrompt = pendingPrompt;
+              const savedModel = pendingModel;
+              
+              // Clear pending data
+              setPendingPrompt('');
+              setPendingModel('');
+              
+              // Reset the password field
+              setPassword('');
+              
+              // Send the pending prompt
+              await sendPrompt(savedPrompt, savedModel);
+            } else {
+              setLoading(false);
+            }
+            return;
+          } else {
+            console.error('Authentication failed: Session not set properly');
+            setPasswordError('Authentication failed. Please try again.');
+          }
         } else {
-          setLoading(false);
+          console.error('Failed to verify authentication status');
+          setPasswordError('Failed to verify authentication. Please try again.');
         }
       } else {
         setPasswordError('Invalid password. Please try again.');
-        setLoading(false);
       }
     } catch (err) {
+      console.error('Error during authentication:', err);
       setPasswordError('Error authenticating: ' + err.message);
-      setLoading(false);
     }
+    
+    setLoading(false);
   };
 
   // Send prompt to backend
