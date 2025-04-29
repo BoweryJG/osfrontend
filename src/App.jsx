@@ -20,7 +20,7 @@ function isFreeModel(model) {
   const freeModels = [
     'google/gemini-pro',
     'google/gemini-1.5-pro',
-    'google/gemini-2.5-pro',
+    'google/gemini-2.0-flash',  // Using Gemini 2.0 Flash which is free
     'anthropic/claude-instant',
     'mistralai/mistral',
     'meta-llama/llama-2'
