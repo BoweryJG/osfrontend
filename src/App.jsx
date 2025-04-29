@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import CosmicBackground from './CosmicBackground';
+import SignUpForm from './SignUpForm';
 
 import { Container, Typography, Paper, Box, Button, TextField, Select, MenuItem, Divider, List, ListItem, ListItemText, CircularProgress, Alert, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
@@ -51,10 +52,13 @@ function App() {
   // State for subscription level and password authentication
   const [subscriptionLevel, setSubscriptionLevel] = useState('free');
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showSignUpForm, setShowSignUpForm] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [pendingPrompt, setPendingPrompt] = useState('');
   const [pendingModel, setPendingModel] = useState('');
+  const [userData, setUserData] = useState(null);
+  const [signUpLoading, setSignUpLoading] = useState(false);
   
   // Load favorites from localStorage and check auth/subscription status
   useEffect(() => {
@@ -133,17 +137,19 @@ function App() {
           name: m.name || m.id,
           provider: m.id.split('/')[0],
           context_length: m.context_length,
+          isPaid: !isFreeModel(m), // Add isPaid flag for easier reference
           ...m
         }));
         chatModels.sort((a, b) => a.id.localeCompare(b.id));
         console.log("Available models:", chatModels.map(m => m.name));
         setModels(chatModels);
         if (chatModels.length > 0) {
-          // Prefer Gemini 2.5 Pro Experimental (free) if present
-          const gemini = chatModels.find(m => m.name && m.name.toLowerCase().includes('gemini 2.5 pro experimental'));
-          if (gemini) {
-            setModel(gemini.id);
+          // Prefer GPT-4 as the default model
+          const gpt4 = chatModels.find(m => m.id.toLowerCase().includes('openai/gpt-4'));
+          if (gpt4) {
+            setModel(gpt4.id);
           } else {
+            // Fallback to other models if GPT-4 is not available
             const firstFree = chatModels.find(isFreeModel);
             setModel(firstFree ? firstFree.id : chatModels[0].id);
           }
@@ -217,11 +223,14 @@ function App() {
     setLoading(true);
     
     try {
-      // Submit the password
+      // Submit the password with user data if available
       const res = await fetch(`${BACKEND_URL.split('/task')[0]}/auth/password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ 
+          password,
+          userData: userData // Include user data if available
+        }),
         credentials: 'include'
       });
       
@@ -300,12 +309,19 @@ function App() {
       if (res.status === 403) {
         const data = await res.json();
         
-        // If this is a paid model that requires password
-        if (data.error === 'Password required') {
-          setError('This model requires a password. Please enter the password to access paid models.');
+        // If this is a paid model that requires registration and password
+        if (data.error === 'Password required' || data.requiresRegistration) {
+          setError('This model requires registration and a password to access.');
           setPendingPrompt(promptText);
           setPendingModel(modelId);
-          setShowPasswordModal(true);
+          
+          // Check if user needs to register first
+          if (data.requiresRegistration) {
+            setShowSignUpForm(true);
+          } else {
+            setShowPasswordModal(true);
+          }
+          
           setLoading(false);
           return;
         }
@@ -555,6 +571,39 @@ function App() {
         </List>
       </div>
     </Container>
+
+    {/* Sign Up Form */}
+    <SignUpForm 
+      open={showSignUpForm} 
+      onClose={() => setShowSignUpForm(false)} 
+      onSubmit={async (formData) => {
+        setSignUpLoading(true);
+        try {
+          // Register the user
+          const res = await fetch(`${BACKEND_URL.split('/task')[0]}/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData),
+            credentials: 'include'
+          });
+          
+          if (res.ok) {
+            // Store user data for password authentication
+            setUserData(formData);
+            setShowSignUpForm(false);
+            setShowPasswordModal(true);
+          } else {
+            const data = await res.json();
+            throw new Error(data.message || 'Registration failed');
+          }
+        } catch (err) {
+          console.error('Error during registration:', err);
+          alert(`Registration failed: ${err.message}`);
+        }
+        setSignUpLoading(false);
+      }}
+      loading={signUpLoading}
+    />
 
     {/* Password Modal */}
     <Dialog open={showPasswordModal} onClose={() => setShowPasswordModal(false)}>
