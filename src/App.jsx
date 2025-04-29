@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import CosmicBackground from './CosmicBackground';
 
-import { Container, Typography, Paper, Box, Button, TextField, Select, MenuItem, Divider, List, ListItem, ListItemText, CircularProgress, Alert, IconButton, Tooltip } from '@mui/material';
+import { Container, Typography, Paper, Box, Button, TextField, Select, MenuItem, Divider, List, ListItem, ListItemText, CircularProgress, Alert, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 import StarIcon from '@mui/icons-material/Star';
 import SendIcon from '@mui/icons-material/Send';
@@ -48,8 +48,13 @@ function App() {
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef(null);
 
-  // State for subscription level
+  // State for subscription level and password authentication
   const [subscriptionLevel, setSubscriptionLevel] = useState('free');
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [pendingPrompt, setPendingPrompt] = useState('');
+  const [pendingModel, setPendingModel] = useState('');
   
   // Load favorites from localStorage and check auth/subscription status
   useEffect(() => {
@@ -201,48 +206,79 @@ function App() {
     recognitionRef.current.start();
   };
 
+  // Handle password submission
+  const handlePasswordSubmit = async () => {
+    if (!password) {
+      setPasswordError('Please enter a password');
+      return;
+    }
+    
+    setPasswordError('');
+    setLoading(true);
+    
+    try {
+      const res = await fetch(`${BACKEND_URL.split('/task')[0]}/auth/password`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+        credentials: 'include'
+      });
+      
+      if (res.ok) {
+        setHasPaidAccess(true);
+        setShowPasswordModal(false);
+        
+        // If we have a pending prompt, send it now
+        if (pendingPrompt && pendingModel) {
+          const savedPrompt = pendingPrompt;
+          const savedModel = pendingModel;
+          
+          // Clear pending data
+          setPendingPrompt('');
+          setPendingModel('');
+          
+          // Reset the password field
+          setPassword('');
+          
+          // Send the pending prompt
+          await sendPrompt(savedPrompt, savedModel);
+        } else {
+          setLoading(false);
+        }
+      } else {
+        setPasswordError('Invalid password. Please try again.');
+        setLoading(false);
+      }
+    } catch (err) {
+      setPasswordError('Error authenticating: ' + err.message);
+      setLoading(false);
+    }
+  };
 
-  const handleSend = async () => {
-    if (!prompt) return;
+  // Send prompt to backend
+  const sendPrompt = async (promptText, modelId) => {
     setLoading(true);
     setResponse('');
     setError('');
+    
     try {
       const res = await fetch(BACKEND_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, model }),
+        body: JSON.stringify({ prompt: promptText, model: modelId }),
         credentials: 'include' // Include cookies for session authentication
       });
       
-      // Handle 403 Forbidden (authentication or subscription required)
+      // Handle 403 Forbidden (password required)
       if (res.status === 403) {
         const data = await res.json();
         
-        // If this is a paid model that requires authentication
-        if (data.error === 'Authentication required for this model') {
-          setError('This model requires authentication. Please log in to use premium models.');
-          
-          // Redirect to login page
-          const loginUrl = `${BACKEND_URL.split('/task')[0]}/auth/google`;
-          
-          if (confirm('This model requires authentication. Would you like to log in?')) {
-            window.location.href = loginUrl;
-            return;
-          } else {
-            // If user cancels, suggest using a free model
-            const selectedModel = models.find(m => m.id === model);
-            if (selectedModel && !isFreeModel(selectedModel)) {
-              const freeModel = models.find(isFreeModel);
-              if (freeModel) {
-                if (confirm(`Would you like to use ${freeModel.name} instead? It's free!`)) {
-                  setModel(freeModel.id);
-                  setLoading(false);
-                  return;
-                }
-              }
-            }
-          }
+        // If this is a paid model that requires password
+        if (data.error === 'Password required') {
+          setError('This model requires a password. Please enter the password to access paid models.');
+          setPendingPrompt(promptText);
+          setPendingModel(modelId);
+          setShowPasswordModal(true);
           setLoading(false);
           return;
         }
@@ -291,18 +327,24 @@ function App() {
       }
       
       // If we got a successful response with a paid model, user must be authenticated
-      const selectedModel = models.find(m => m.id === model);
+      const selectedModel = models.find(m => m.id === modelId);
       if (selectedModel && !isFreeModel(selectedModel)) {
         setHasPaidAccess(true);
       }
       
       setResponse(aiResponse);
-      setHistory([{ prompt, response: aiResponse, model, timestamp: new Date().toLocaleString() }, ...history]);
+      setHistory([{ prompt: promptText, response: aiResponse, model: modelId, timestamp: new Date().toLocaleString() }, ...history]);
       setPrompt('');
     } catch (err) {
       setError(err.message || 'Error contacting backend.');
     }
     setLoading(false);
+  };
+
+  // Main send handler
+  const handleSend = () => {
+    if (!prompt) return;
+    sendPrompt(prompt, model);
   };
 
   return (
@@ -486,6 +528,41 @@ function App() {
         </List>
       </div>
     </Container>
+
+    {/* Password Modal */}
+    <Dialog open={showPasswordModal} onClose={() => setShowPasswordModal(false)}>
+      <DialogTitle>Enter Password</DialogTitle>
+      <DialogContent>
+        <Typography variant="body2" sx={{ mb: 2 }}>
+          This model requires a password to access. Please enter the password below:
+        </Typography>
+        <TextField
+          autoFocus
+          margin="dense"
+          label="Password"
+          type="password"
+          fullWidth
+          variant="outlined"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          error={!!passwordError}
+          helperText={passwordError}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handlePasswordSubmit();
+            }
+          }}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => setShowPasswordModal(false)} color="primary">
+          Cancel
+        </Button>
+        <Button onClick={handlePasswordSubmit} color="primary" disabled={loading}>
+          {loading ? <CircularProgress size={24} /> : 'Submit'}
+        </Button>
+      </DialogActions>
+    </Dialog>
   </>
   );
 }
