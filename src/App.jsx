@@ -300,6 +300,11 @@ function App() {
     console.log('Authentication reset: Requiring password for paid models');
   }, []);
 
+  // Debug log for authentication state
+  useEffect(() => {
+    console.log('Authentication state changed:', { hasPaidAccess });
+  }, [hasPaidAccess]);
+
   // Show all models, but only allow selection of free ones unless hasPaidAccess
   const sortedModels = [
     ...models.filter(m => favorites.includes(m.id)),
@@ -493,7 +498,8 @@ function App() {
       
       // If we got a successful response with a paid model, user must be authenticated
       const selectedModel = models.find(m => m.id === modelId);
-      if (selectedModel && !selectedModel.isFree) {
+      if (selectedModel && selectedModel.isPaid) {
+        console.log('Setting hasPaidAccess to true after successful response with paid model');
         setHasPaidAccess(true);
       }
       
@@ -512,7 +518,10 @@ function App() {
     
     // Check if this is a paid model and user doesn't have access
     const selectedModel = models.find(m => m.id === model);
-    if (selectedModel && !selectedModel.isFree && !hasPaidAccess) {
+    console.log('Sending with model:', selectedModel);
+    
+    if (selectedModel && selectedModel.isPaid && !hasPaidAccess) {
+      console.log('Showing sign-up form for paid model before sending');
       // Show sign-up form
       setShowSignUpForm(true);
       
@@ -521,6 +530,7 @@ function App() {
       setPendingModel(model);
     } else {
       // User has access or it's a free model
+      console.log('Sending prompt directly (free model or has access)');
       sendPrompt(prompt, model);
     }
   };
@@ -592,8 +602,11 @@ function App() {
                 const selected = e.target.value;
                 const selectedModel = models.find(m => m.id === selected);
                 
+                console.log('Model selected:', selectedModel);
+                
                 // Check if this is a paid model and user doesn't have access
-                if (selectedModel && !selectedModel.isFree && !hasPaidAccess) {
+                if (selectedModel && selectedModel.isPaid && !hasPaidAccess) {
+                  console.log('Showing sign-up form for paid model');
                   // Show sign-up form
                   setShowSignUpForm(true);
                   
@@ -601,6 +614,7 @@ function App() {
                   setPendingModel(selected);
                 } else {
                   // User has access or it's a free model
+                  console.log('Setting model directly (free or has access)');
                   setModel(selected);
                 }
               }}
@@ -621,7 +635,7 @@ function App() {
                         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                           <span style={{ fontWeight: 600 }}>{m.name}</span>
                           <span style={{ fontSize: 12, color: '#666' }}>{m.provider} &mdash; ctx: {m.context_length || '?'} tokens</span>
-                          {!m.isFree && !hasPaidAccess && (
+                          {m.isPaid && !hasPaidAccess && (
                             <span style={{ color: '#c00', fontSize: 11 }}>Exclusive – Unlock with Pro</span>
                           )}
                         </Box>
