@@ -23,8 +23,15 @@ function isFreeModel(model) {
   }
   
   // Secondary check: Check for "$0/M" pricing in the model metadata
-  if (model.pricing && model.pricing.includes("$0/M")) {
-    return true;
+  if (model.pricing) {
+    // Handle different data types for pricing
+    const pricingStr = typeof model.pricing === 'string' 
+      ? model.pricing 
+      : JSON.stringify(model.pricing);
+    
+    if (pricingStr.includes("$0/M") || pricingStr.includes("$0") || pricingStr.includes("free")) {
+      return true;
+    }
   }
   
   // Fallback to the existing list for backward compatibility
@@ -52,8 +59,18 @@ function isPaidModel(model) {
   }
   
   // Secondary check: Check for non-zero pricing in the model metadata
-  if (model.pricing && !model.pricing.includes("$0/M") && model.pricing.includes("$")) {
-    return true;
+  if (model.pricing) {
+    // Handle different data types for pricing
+    const pricingStr = typeof model.pricing === 'string' 
+      ? model.pricing 
+      : JSON.stringify(model.pricing);
+    
+    if (pricingStr.includes("$") && 
+        !pricingStr.includes("$0/M") && 
+        !pricingStr.includes("$0") && 
+        !pricingStr.includes("free")) {
+      return true;
+    }
   }
   
   // Check for premium model families
