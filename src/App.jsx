@@ -216,12 +216,45 @@ function App() {
           }
         }
       } catch (err) {
-        setModelsError('Could not load models. Showing defaults.');
-        setModels([
-          { id: 'openai/gpt-4', name: 'OpenAI GPT-4', provider: 'openai', context_length: 128000 },
-          { id: 'google/gemini-pro', name: 'Google Gemini Pro', provider: 'google', context_length: 32768 },
-          { id: 'anthropic/claude-3-opus', name: 'Anthropic Claude 3 Opus', provider: 'anthropic', context_length: 200000 },
-        ]);
+        console.error('Error fetching models from OpenRouter:', err);
+        const errorMessage = err.message || 'Unknown error';
+        setModelsError(`Could not load models (${errorMessage}). Showing defaults.`);
+        
+        // Create default models with isFree and isPaid properties
+        const defaultModels = [
+          { 
+            id: 'openai/gpt-4', 
+            name: 'OpenAI GPT-4', 
+            provider: 'openai', 
+            context_length: 128000,
+            isFree: false,
+            isPaid: true
+          },
+          { 
+            id: 'google/gemini-pro', 
+            name: 'Google Gemini Pro (free)', 
+            provider: 'google', 
+            context_length: 32768,
+            isFree: true,
+            isPaid: false
+          },
+          { 
+            id: 'anthropic/claude-3-opus', 
+            name: 'Anthropic Claude 3 Opus', 
+            provider: 'anthropic', 
+            context_length: 200000,
+            isFree: false,
+            isPaid: true
+          },
+        ];
+        
+        setModels(defaultModels);
+        
+        // Set a free model as default
+        const freeModel = defaultModels.find(m => m.isFree);
+        if (freeModel) {
+          setModel(freeModel.id);
+        }
       }
       setModelsLoading(false);
     }
