@@ -13,24 +13,67 @@ const FAVORITES_KEY = 'favorite_models_v1';
 const AUTH_STATUS_KEY = 'auth_status_v1';
 const ADMIN_EMAIL = 'Jasonwilliamgolden@gmail.com'; // Admin email for subscription upgrade requests
 
-// Helper to check if a model is free based on its ID - aligned with backend logic
+// Helper to check if a model is free based on its name, pricing, or ID
 function isFreeModel(model) {
   if (!model || !model.id) return false;
   
-  // List of free models or patterns that identify free models - same as backend
+  // Primary check: Look for "(free)" in the model name
+  if (model.name && model.name.toLowerCase().includes("(free)")) {
+    return true;
+  }
+  
+  // Secondary check: Check for "$0/M" pricing in the model metadata
+  if (model.pricing && model.pricing.includes("$0/M")) {
+    return true;
+  }
+  
+  // Fallback to the existing list for backward compatibility
   const freeModels = [
     'google/gemini-pro',
     'google/gemini-1.5-pro',
-    'google/gemini-2.0-flash',  // Using Gemini 2.0 Flash which is free
+    'google/gemini-2.0-flash',
     'anthropic/claude-instant',
     'mistralai/mistral',
     'meta-llama/llama-2'
   ];
   
-  // Check if the model ID contains any of the free model patterns
   return freeModels.some(freeModel => 
     model.id.toLowerCase().includes(freeModel.toLowerCase())
   );
+}
+
+// Helper to check if a model is paid based on its name, pricing, or ID
+function isPaidModel(model) {
+  if (!model || !model.id) return false;
+  
+  // Primary check: Look for "(paid)" in the model name
+  if (model.name && model.name.toLowerCase().includes("(paid)")) {
+    return true;
+  }
+  
+  // Secondary check: Check for non-zero pricing in the model metadata
+  if (model.pricing && !model.pricing.includes("$0/M") && model.pricing.includes("$")) {
+    return true;
+  }
+  
+  // Check for premium model families
+  const paidModelFamilies = [
+    'openai/gpt-4',
+    'anthropic/claude-3-opus',
+    'anthropic/claude-3-sonnet',
+    'anthropic/claude-3-haiku',
+    'google/gemini-1.5-pro-latest',
+    'mistralai/mistral-large'
+  ];
+  
+  if (paidModelFamilies.some(paidModel => 
+    model.id.toLowerCase().includes(paidModel.toLowerCase())
+  )) {
+    return true;
+  }
+  
+  // If it's not explicitly free, consider it paid
+  return !isFreeModel(model);
 }
 
 function App() {
@@ -132,26 +175,44 @@ function App() {
         });
         if (!res.ok) throw new Error(`Failed to fetch models: ${res.status}`);
         const data = await res.json();
-        const chatModels = (data.data || []).filter(m => m.id && m.id.includes('/')).map(m => ({
-          id: m.id,
-          name: m.name || m.id,
-          provider: m.id.split('/')[0],
-          context_length: m.context_length,
-          isPaid: !isFreeModel(m), // Add isPaid flag for easier reference
-          ...m
-        }));
+        const chatModels = (data.data || []).filter(m => m.id && m.id.includes('/')).map(m => {
+          const modelData = {
+            id: m.id,
+            name: m.name || m.id,
+            provider: m.id.split('/')[0],
+            context_length: m.context_length,
+            ...m
+          };
+          
+          // Add isFree and isPaid flags for easier reference
+          modelData.isFree = isFreeModel(modelData);
+          modelData.isPaid = isPaidModel(modelData);
+          
+          return modelData;
+        });
         chatModels.sort((a, b) => a.id.localeCompare(b.id));
         console.log("Available models:", chatModels.map(m => m.name));
         setModels(chatModels);
         if (chatModels.length > 0) {
-          // Prefer GPT-4 as the default model
-          const gpt4 = chatModels.find(m => m.id.toLowerCase().includes('openai/gpt-4'));
-          if (gpt4) {
-            setModel(gpt4.id);
+          // Prefer free models first, especially Gemini 2.0 Flash Experimental
+          const geminiFlash = chatModels.find(m => 
+            m.name && m.name.toLowerCase().includes("gemini 2.0 flash") && 
+            m.name.toLowerCase().includes("(free)")
+          );
+          
+          if (geminiFlash) {
+            console.log("Setting default model to Gemini 2.0 Flash (free)");
+            setModel(geminiFlash.id);
           } else {
-            // Fallback to other models if GPT-4 is not available
-            const firstFree = chatModels.find(isFreeModel);
-            setModel(firstFree ? firstFree.id : chatModels[0].id);
+            // Fallback to any free model
+            const firstFree = chatModels.find(m => m.isFree);
+            if (firstFree) {
+              console.log("Setting default model to free model:", firstFree.name);
+              setModel(firstFree.id);
+            } else {
+              console.log("No free models found, using first available model");
+              setModel(chatModels[0].id);
+            }
           }
         }
       } catch (err) {
@@ -349,7 +410,7 @@ function App() {
           } else {
             // If user cancels, suggest using a model they have access to
             const accessibleModels = models.filter(m => {
-              if (isFreeModel(m)) return true;
+              if (m.isFree) return true;
               if (subscriptionLevel === 'asm' && m.id.toLowerCase().match(/(phi|claude-instant|mistral-medium|gemini-1\.5-flash)/)) return true;
               return false;
             });
@@ -382,7 +443,7 @@ function App() {
       
       // If we got a successful response with a paid model, user must be authenticated
       const selectedModel = models.find(m => m.id === modelId);
-      if (selectedModel && !isFreeModel(selectedModel)) {
+      if (selectedModel && !selectedModel.isFree) {
         setHasPaidAccess(true);
       }
       
@@ -401,7 +462,7 @@ function App() {
     
     // Check if this is a paid model and user doesn't have access
     const selectedModel = models.find(m => m.id === model);
-    if (selectedModel && !isFreeModel(selectedModel) && !hasPaidAccess) {
+    if (selectedModel && !selectedModel.isFree && !hasPaidAccess) {
       // Show sign-up form
       setShowSignUpForm(true);
       
@@ -482,7 +543,7 @@ function App() {
                 const selectedModel = models.find(m => m.id === selected);
                 
                 // Check if this is a paid model and user doesn't have access
-                if (selectedModel && !isFreeModel(selectedModel) && !hasPaidAccess) {
+                if (selectedModel && !selectedModel.isFree && !hasPaidAccess) {
                   // Show sign-up form
                   setShowSignUpForm(true);
                   
@@ -500,7 +561,7 @@ function App() {
               {sortedModels.length === 0 ? (
                 <MenuItem disabled>No models found</MenuItem>
               ) : sortedModels.map(m => {
-                  const isFree = isFreeModel(m);
+                  // Use the pre-computed isFree property
                   return (
                     <MenuItem
                       value={m.id}
@@ -510,7 +571,7 @@ function App() {
                         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                           <span style={{ fontWeight: 600 }}>{m.name}</span>
                           <span style={{ fontSize: 12, color: '#666' }}>{m.provider} &mdash; ctx: {m.context_length || '?'} tokens</span>
-                          {!isFree && !hasPaidAccess && (
+                          {!m.isFree && !hasPaidAccess && (
                             <span style={{ color: '#c00', fontSize: 11 }}>Exclusive – Unlock with Pro</span>
                           )}
                         </Box>
