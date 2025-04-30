@@ -178,6 +178,17 @@ function App() {
     setFavorites(favs => favs.includes(id) ? favs.filter(f => f !== id) : [...favs, id]);
   };
 
+  // Reset hasPaidAccess to false to ensure authentication is required
+  useEffect(() => {
+    // Force hasPaidAccess to false on component mount
+    setHasPaidAccess(false);
+    
+    // Clear any stored authentication
+    localStorage.removeItem('auth_token');
+    
+    console.log('Authentication reset: Requiring password for paid models');
+  }, []);
+
   // Show all models, but only allow selection of free ones unless hasPaidAccess
   const sortedModels = [
     ...models.filter(m => favorites.includes(m.id)),
@@ -387,7 +398,20 @@ function App() {
   // Main send handler
   const handleSend = () => {
     if (!prompt) return;
-    sendPrompt(prompt, model);
+    
+    // Check if this is a paid model and user doesn't have access
+    const selectedModel = models.find(m => m.id === model);
+    if (selectedModel && !isFreeModel(selectedModel) && !hasPaidAccess) {
+      // Show sign-up form
+      setShowSignUpForm(true);
+      
+      // Store the prompt and model as pending
+      setPendingPrompt(prompt);
+      setPendingModel(model);
+    } else {
+      // User has access or it's a free model
+      sendPrompt(prompt, model);
+    }
   };
 
   return (
@@ -455,7 +479,19 @@ function App() {
               value={model}
               onChange={e => {
                 const selected = e.target.value;
-                setModel(selected);
+                const selectedModel = models.find(m => m.id === selected);
+                
+                // Check if this is a paid model and user doesn't have access
+                if (selectedModel && !isFreeModel(selectedModel) && !hasPaidAccess) {
+                  // Show sign-up form
+                  setShowSignUpForm(true);
+                  
+                  // Store the selected model as pending
+                  setPendingModel(selected);
+                } else {
+                  // User has access or it's a free model
+                  setModel(selected);
+                }
               }}
               size="small"
               sx={{ minWidth: 340, background: '#fff' }}
