@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Connection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0069d9;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Backend Connection Test</h1>
+    
+    <div>
+        <h2>Render Backend</h2>
+        <button id="testRender">Test Render Backend</button>
+        <div id="renderStatus" class="status"></div>
+        <h3>Response Details:</h3>
+        <pre id="renderResponse"></pre>
+    </div>
+
+    <hr>
+
+    <div>
+        <h2>Local Backend</h2>
+        <button id="testLocal">Test Local Backend</button>
+        <div id="localStatus" class="status"></div>
+        <h3>Response Details:</h3>
+        <pre id="localResponse"></pre>
+    </div>
+
+    <script>
+        async function testEndpoint(url, statusElement, responseElement) {
+            statusElement.textContent = 'Testing...';
+            statusElement.className = 'status';
+            responseElement.textContent = '';
+            
+            try {
+                const startTime = Date.now();
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'omit'
+                });
+                
+                const endTime = Date.now();
+                const responseTime = endTime - startTime;
+                
+                let responseText = '';
+                let responseJson = null;
+                
+                try {
+                    responseText = await response.text();
+                    try {
+                        responseJson = JSON.parse(responseText);
+                    } catch (e) {
+                        // Not JSON, use text
+                    }
+                } catch (e) {
+                    responseText = '(No response body or error reading it)';
+                }
+                
+                if (response.ok) {
+                    statusElement.textContent = `Connected successfully (${responseTime}ms)`;
+                    statusElement.className = 'status success';
+                } else {
+                    statusElement.textContent = `Failed to connect: ${response.status} ${response.statusText} (${responseTime}ms)`;
+                    statusElement.className = 'status error';
+                }
+                
+                // Display response details
+                responseElement.textContent = `Status: ${response.status} ${response.statusText}
+Response Time: ${responseTime}ms
+Headers: ${JSON.stringify(Object.fromEntries([...response.headers]), null, 2)}
+Body: ${JSON.stringify(responseJson, null, 2) || responseText}`;
+
+            } catch (error) {
+                statusElement.textContent = `Error: ${error.message}`;
+                statusElement.className = 'status error';
+                responseElement.textContent = error.stack;
+            }
+        }
+        
+        // Test buttons
+        document.getElementById('testRender').addEventListener('click', () => {
+            testEndpoint(
+                'https://osbackend-zl1h.onrender.com/health',
+                document.getElementById('renderStatus'),
+                document.getElementById('renderResponse')
+            );
+        });
+        
+        document.getElementById('testLocal').addEventListener('click', () => {
+            testEndpoint(
+                'http://localhost:3000/health',
+                document.getElementById('localStatus'),
+                document.getElementById('localResponse')
+            );
+        });
+        
+        // Test task endpoints
+        document.getElementById('testRender').addEventListener('dblclick', () => {
+            testEndpoint(
+                'https://osbackend-zl1h.onrender.com/task',
+                document.getElementById('renderStatus'),
+                document.getElementById('renderResponse')
+            );
+        });
+        
+        document.getElementById('testLocal').addEventListener('dblclick', () => {
+            testEndpoint(
+                'http://localhost:3000/task',
+                document.getElementById('localStatus'),
+                document.getElementById('localResponse')
+            );
+        });
+        
+        // Automatic test on page load
+        window.addEventListener('load', () => {
+            // Auto-test the Render backend
+            testEndpoint(
+                'https://osbackend-zl1h.onrender.com/health',
+                document.getElementById('renderStatus'),
+                document.getElementById('renderResponse')
+            );
+        });
+    </script>
+</body>
+</html>

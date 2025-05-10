@@ -119,6 +119,50 @@ function App() {
   const [pendingModel, setPendingModel] = useState('');
   const [userData, setUserData] = useState(null);
   const [signUpLoading, setSignUpLoading] = useState(false);
+  const [backendStatus, setBackendStatus] = useState("unknown");
+  
+  // Test connection to backend
+  const testBackendConnection = async () => {
+    try {
+      // Try the Render backend directly
+      let healthUrl = 'https://osbackend-zl1h.onrender.com/health';
+      console.log("Testing connection to Render backend:", healthUrl);
+      const startTime = Date.now();
+      const response = await fetch(healthUrl, {
+        method: 'GET',
+        // Don't include credentials to avoid CORS issues
+        credentials: 'omit',
+        // Add some headers to help with CORS
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      const endTime = Date.now();
+      const responseTime = endTime - startTime;
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Backend connection successful:", data);
+        setBackendStatus(`Connected to Render backend (${responseTime}ms)`);
+        return true;
+      } else {
+        console.error("Backend connection failed:", response.status);
+        setBackendStatus(`Failed to connect to Render backend: ${response.status}`);
+        return false;
+      }
+    } catch (err) {
+      console.error("Backend connection error:", err);
+      setBackendStatus(`Error connecting to ${BACKEND_URL}: ${err.message}`);
+      return false;
+    }
+  };
+  
+  // Test backend connection on component mount
+  useEffect(() => {
+    // Test the backend connection on initial load
+    console.log("Testing backend connection on initial load...");
+    testBackendConnection();
+  }, []);
   
   // Load favorites from localStorage and check auth/subscription status
   useEffect(() => {
@@ -584,6 +628,31 @@ function App() {
           }}>
             Sphere oS
           </Typography>
+          
+          {/* Backend Status Indicator */}
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            mb: 2,
+            backgroundColor: backendStatus.includes('Connected') ? 'rgba(0, 255, 0, 0.1)' : 'rgba(255, 0, 0, 0.1)',
+            padding: '4px 12px',
+            borderRadius: '8px',
+            gap: 2,
+            border: backendStatus.includes('Connected') ? '1px solid rgba(0, 255, 0, 0.3)' : '1px solid rgba(255, 0, 0, 0.3)'
+          }}>
+            <Typography variant="body2" color={backendStatus.includes('Connected') ? '#4caf50' : '#f44336'}>
+              Backend: {backendStatus === 'unknown' ? 'Status unknown' : backendStatus}
+            </Typography>
+            <Button 
+              variant="outlined" 
+              size="small" 
+              onClick={testBackendConnection}
+              sx={{ ml: 1, minWidth: 0, fontSize: '0.7rem', height: '24px' }}
+            >
+              Test Connection
+            </Button>
+          </Box>
           <Box sx={{ display: 'flex', gap: 2, mb: 1, alignItems: 'center' }}>
             <Typography variant="subtitle2" sx={{ color: '#5BC0EB', fontWeight: 700, fontSize: 16, mr: 2 }}>
               Model:
