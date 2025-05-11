@@ -67,6 +67,7 @@ const Header = ({ isAestheticMode, toggleAestheticMode }) => {
         <Button
           variant="contained"
           startIcon={<ArrowBackIcon />}
+          onClick={() => window.location.href = '/'}
           sx={{
             mr: 2,
             backgroundColor: 'rgba(30, 30, 40, 0.6)',

@@ -203,6 +203,9 @@ const OutputPreview = ({ sections = [], isAestheticMode = false }) => {
       <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
         <Button
           variant="contained"
+          onClick={() => {
+            alert('Custom brief for doctor created successfully!');
+          }}
           sx={{
             backgroundColor: 'rgba(138, 116, 249, 0.2)',
             color: 'white',

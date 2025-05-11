@@ -71,6 +71,7 @@ const SalesStrategiesForm = ({ onSubmit, marketIntelData, isAestheticMode = fals
           </Typography>
           <Button
             variant="outlined"
+            onClick={() => window.location.reload()}
             sx={{
               borderColor: isAestheticMode ? 'rgba(138, 116, 249, 0.6)' : 'primary.main',
               color: isAestheticMode ? 'rgba(138, 116, 249, 0.9)' : 'primary.main',

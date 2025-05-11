@@ -59,6 +59,21 @@ function App() {
     setSelectedOption(option);
   };
 
+  // Add event listener for custom navigation events
+  React.useEffect(() => {
+    const handleNavigate = (event) => {
+      if (event.detail) {
+        setSelectedOption(event.detail);
+      }
+    };
+    
+    window.addEventListener('navigate', handleNavigate);
+    
+    return () => {
+      window.removeEventListener('navigate', handleNavigate);
+    };
+  }, []);
+
   const handleMarketIntelSubmit = (data) => {
     setMarketIntelData(data);
     
@@ -79,6 +94,9 @@ function App() {
       marketAnalysis: prev.marketAnalysis + `\n\nKey challenges identified: ${data.challenges}`,
       competitiveLandscape: prev.competitiveLandscape + `\n\nProduct benefits to highlight: ${data.benefits}`,
     }));
+    
+    // Navigate to the doctor report section after submitting sales strategies
+    setSelectedOption('doctorReport');
   };
 
   const handleDoctorReportSubmit = (data) => {

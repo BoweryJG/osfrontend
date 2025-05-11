@@ -22,6 +22,8 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
     e.preventDefault();
     if (onSubmit) {
       onSubmit(formData);
+      // Navigate to sales strategies after submitting
+      window.dispatchEvent(new CustomEvent('navigate', { detail: 'salesStrategies' }));
     }
   };
 
