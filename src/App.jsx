@@ -626,7 +626,7 @@ function App() {
             textShadow: '0 2px 16px #23263a, 0 1px 2px #5BC0EB44',
             fontFamily: 'Montserrat, Roboto, Arial, sans-serif'
           }}>
-            Sphere oS
+            Workspace
           </Typography>
           
           {/* Backend Status Indicator */}
