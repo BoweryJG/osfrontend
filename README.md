@@ -1,36 +1,77 @@
-# MCP AI Frontend
+# repSpheres Frontend
 
-A visually stunning, advanced dashboard for interacting with your MCP AI backend and Supabase logs.
+A modern web application for medical sales representatives to generate AI-powered doctor reports.
 
 ## Features
-- Modern, dark-themed UI (Material UI)
-- Prompt input with model selection (GPT-4, Claude, Gemini, etc.)
-- Real-time LLM responses in a chat-style interface
-- Request/response history from Supabase
-- Responsive and beautiful design
 
-## Setup
-1. `cd mcp-ai-frontend`
-2. `npm install`
-3. Edit `src/App.jsx` and fill in your Supabase URL and key at the top:
-   ```js
-   const SUPABASE_URL = 'your_supabase_url';
-   const SUPABASE_KEY = 'your_supabase_key';
-   ```
-4. Make sure your backend is running at `http://localhost:3000` (or update `BACKEND_URL` if different).
-5. Start the frontend:
-   ```bash
-   npm run dev
-   ```
-6. Open [http://localhost:5173](http://localhost:5173) in your browser.
+- **AI Prompt Selection**: Choose from a variety of pre-defined prompts stored in Supabase
+- **Market Intelligence**: Input market data about doctors and products
+- **Sales Strategies**: Define sales approaches and success metrics
+- **Doctor-Ready Reports**: Generate comprehensive reports using OpenRouter API
+- **Modern UI**: Sleek, responsive interface with cosmic theme
 
----
+## Technical Stack
 
-You can now:
-- Enter prompts and get responses from your LLM backend
-- View a history of requests and responses (from Supabase)
-- Switch models and enjoy a beautiful, modern interface
+- **Frontend**: React with Vite
+- **UI Framework**: Material-UI (MUI)
+- **Database**: Supabase
+- **AI Integration**: OpenRouter API
+- **State Management**: React Hooks
+- **Styling**: CSS-in-JS with MUI's styling system
 
----
+## Supabase Integration
 
-For further customization or deployment, see the Vite and Material UI docs.
+The application connects to a Supabase database to fetch and manage AI prompts. The database contains:
+
+- **ai_prompts table**: Stores prompt templates, model preferences, and usage statistics
+
+## OpenRouter API Integration
+
+The application uses OpenRouter API to generate AI content based on:
+
+- Selected prompt template
+- User-provided market intelligence
+- Sales strategy information
+
+## Environment Variables
+
+The application requires the following environment variables:
+
+```
+VITE_API_URL=http://localhost:3000/task
+VITE_OPENROUTER_API_KEY=your-openrouter-api-key
+```
+
+## Getting Started
+
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Create `.env` file with required environment variables
+4. Start the development server: `npm run dev`
+
+## Project Structure
+
+- `src/components/`: React components
+- `src/utils/`: Utility functions for API calls
+- `src/App.jsx`: Main application component
+- `src/main.jsx`: Application entry point
+
+## Key Components
+
+- **PromptSelector**: Interface for selecting AI prompts from Supabase
+- **MarketIntelForm**: Form for inputting market intelligence data
+- **SalesStrategiesForm**: Form for defining sales strategies
+- **DoctorReportForm**: Form for generating the final doctor report
+- **OutputPreview**: Preview panel showing generated content
+
+## Workflow
+
+1. User selects an AI prompt template
+2. User fills out the Market Intelligence form
+3. User completes the Sales Strategies form
+4. User generates a Doctor-Ready Report using OpenRouter API
+5. The report is displayed and can be copied or saved
+
+## Deployment
+
+The application is configured for deployment on Netlify with environment variables set in the Netlify dashboard.

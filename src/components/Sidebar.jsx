@@ -13,6 +13,11 @@ const Sidebar = ({ selectedOption, onOptionSelect }) => {
       icon: <SmartToyOutlinedIcon />,
     },
     {
+      id: 'selectPrompt',
+      label: 'Select Prompt',
+      icon: <SmartToyOutlinedIcon />,
+    },
+    {
       id: 'marketIntel',
       label: 'Market Intel',
       icon: <InsightsOutlinedIcon />,

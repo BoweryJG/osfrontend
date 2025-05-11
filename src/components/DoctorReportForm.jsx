@@ -1,21 +1,78 @@
 import React, { useState } from 'react';
-import { Box, Typography, Button, Paper, Grid, Chip, Avatar } from '@mui/material';
+import { Box, Typography, Button, Paper, Grid, Chip, Avatar, CircularProgress } from '@mui/material';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { generateContent } from '../utils/openRouterClient';
+import { incrementPromptUsage } from '../utils/supabaseClient';
 
 const DoctorReportForm = ({
   onSubmit,
   marketIntelData,
   salesStrategiesData,
   isAestheticMode = false,
+  selectedPromptData,
 }) => {
-  const handleSubmit = (e) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [generatedReport, setGeneratedReport] = useState(null);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (onSubmit) {
-      onSubmit({
-        marketIntelData,
-        salesStrategiesData,
-      });
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Prepare the prompt content
+      let promptContent = selectedPromptData?.promptContent || 
+        `Generate a comprehensive doctor report for ${marketIntelData.doctorName} about ${marketIntelData.product} in ${marketIntelData.city}, ${marketIntelData.state}.`;
+
+      // If we don't have a selected prompt, create a default one
+      if (!selectedPromptData) {
+        // Replace variables in the prompt with actual data
+        Object.entries(marketIntelData).forEach(([key, value]) => {
+          promptContent = promptContent.replace(new RegExp(`{{${key}}}`, 'g'), value);
+        });
+        
+        if (salesStrategiesData) {
+          Object.entries(salesStrategiesData).forEach(([key, value]) => {
+            promptContent = promptContent.replace(new RegExp(`{{${key}}}`, 'g'), value);
+          });
+        }
+      }
+
+      // Generate content using the OpenRouter API
+      const model = selectedPromptData?.model || 'gpt-4o';
+      const systemPrompt = 'You are an expert medical marketing assistant. Generate detailed, professional reports for doctors based on the provided information.';
+      
+      const generatedContent = await generateContent(promptContent, model, systemPrompt);
+      
+      // If we have a selected prompt, increment its usage count
+      if (selectedPromptData?.promptId) {
+        try {
+          await incrementPromptUsage(selectedPromptData.promptId);
+          console.log('Prompt usage count incremented');
+        } catch (err) {
+          console.error('Error incrementing prompt usage count:', err);
+          // Don't fail the whole operation if this fails
+        }
+      }
+      
+      setGeneratedReport(generatedContent);
+      
+      // Call the parent component's onSubmit with all data
+      if (onSubmit) {
+        onSubmit({
+          marketIntelData,
+          salesStrategiesData,
+          generatedReport: generatedContent,
+          promptData: selectedPromptData
+        });
+      }
+    } catch (err) {
+      console.error('Error generating report:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -160,6 +217,48 @@ const DoctorReportForm = ({
         </Grid>
       </Box>
 
+      {error && (
+        <Paper
+          elevation={0}
+          sx={{
+            p: 2,
+            backgroundColor: 'rgba(211, 47, 47, 0.1)',
+            borderRadius: '12px',
+            border: '1px solid rgba(211, 47, 47, 0.3)',
+            mb: 4,
+          }}
+        >
+          <Typography variant="body1" color="error">
+            Error: {error}
+          </Typography>
+          <Typography variant="body2" sx={{ mt: 1, opacity: 0.8 }}>
+            Please try again or contact support if the issue persists.
+          </Typography>
+        </Paper>
+      )}
+
+      {generatedReport && (
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            backgroundColor: 'rgba(46, 125, 50, 0.1)',
+            borderRadius: '12px',
+            border: '1px solid rgba(46, 125, 50, 0.3)',
+            mb: 4,
+            maxHeight: '300px',
+            overflow: 'auto',
+          }}
+        >
+          <Typography variant="h6" sx={{ mb: 2, fontWeight: 500 }}>
+            Generated Report
+          </Typography>
+          <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+            {generatedReport}
+          </Typography>
+        </Paper>
+      )}
+
       {!canGenerateReport ? (
         <Box sx={{ textAlign: 'center', py: 3 }}>
           <Typography variant="body1" sx={{ mb: 2, opacity: 0.9 }}>
@@ -194,6 +293,7 @@ const DoctorReportForm = ({
           <Button
             type="submit"
             variant="contained"
+            disabled={loading}
             sx={{
               backgroundColor: isAestheticMode ? 'rgba(138, 116, 249, 0.6)' : 'primary.main',
               color: 'white',
@@ -204,7 +304,14 @@ const DoctorReportForm = ({
               },
             }}
           >
-            Generate Doctor-Ready Report
+            {loading ? (
+              <>
+                <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
+                Generating...
+              </>
+            ) : (
+              'Generate Doctor-Ready Report'
+            )}
           </Button>
         </Box>
       )}

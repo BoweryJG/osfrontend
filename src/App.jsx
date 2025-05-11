@@ -9,6 +9,7 @@ import OutputPreview from './components/OutputPreview';
 import MarketIntelForm from './components/MarketIntelForm';
 import SalesStrategiesForm from './components/SalesStrategiesForm';
 import DoctorReportForm from './components/DoctorReportForm';
+import PromptSelector from './components/PromptSelector';
 import CosmicBackground from './CosmicBackground';
 
 const darkTheme = createTheme({
@@ -42,9 +43,10 @@ const darkTheme = createTheme({
 
 function App() {
   const [isAestheticMode, setIsAestheticMode] = useState(true);
-  const [selectedOption, setSelectedOption] = useState('marketIntel');
+  const [selectedOption, setSelectedOption] = useState('selectPrompt');
   const [marketIntelData, setMarketIntelData] = useState(null);
   const [salesStrategiesData, setSalesStrategiesData] = useState(null);
+  const [selectedPromptData, setSelectedPromptData] = useState(null);
   const [outputSections, setOutputSections] = useState({
     marketAnalysis: '',
     industryOverview: '',
@@ -100,11 +102,26 @@ function App() {
   };
 
   const handleDoctorReportSubmit = (data) => {
-    // In a real app, this would generate a comprehensive report
-    console.log('Generating doctor report with:', data);
+    // Log the generated report data
+    console.log('Doctor report generated:', data);
     
-    // For demo purposes, we'll just show an alert
+    // Update the output sections with the generated report
+    if (data.generatedReport) {
+      setOutputSections(prev => ({
+        ...prev,
+        marketAnalysis: data.generatedReport.substring(0, 500) + '...',
+        industryOverview: 'Generated using ' + (data.promptData?.promptName || 'default prompt'),
+        competitiveLandscape: 'Model used: ' + (data.promptData?.model || 'gpt-4o'),
+      }));
+    }
+    
+    // Show a success message
     alert(`Doctor-Ready Report generated for Dr. ${data.marketIntelData.doctorName} on ${data.marketIntelData.product}`);
+  };
+
+  const handlePromptSelect = (promptData) => {
+    setSelectedPromptData(promptData);
+    console.log('Selected prompt:', promptData);
   };
 
   const renderContent = () => {
@@ -118,6 +135,15 @@ function App() {
             <Typography variant="body1" sx={{ color: 'white' }}>
               Model selection functionality would go here.
             </Typography>
+          </ContentArea>
+        );
+      case 'selectPrompt':
+        return (
+          <ContentArea>
+            <PromptSelector
+              onSubmit={handlePromptSelect}
+              isAestheticMode={isAestheticMode}
+            />
           </ContentArea>
         );
       case 'marketIntel':
@@ -146,6 +172,7 @@ function App() {
               onSubmit={handleDoctorReportSubmit}
               marketIntelData={marketIntelData}
               salesStrategiesData={salesStrategiesData}
+              selectedPromptData={selectedPromptData}
               isAestheticMode={isAestheticMode} 
             />
           </ContentArea>
