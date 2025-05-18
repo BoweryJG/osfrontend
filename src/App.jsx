@@ -14,6 +14,7 @@ import PromptSelector from './components/PromptSelector';
 import CosmicBackground from './CosmicBackground';
 import Navbar from './components/Navbar';
 import OrbContextProvider from './components/OrbContextProvider';
+import AnalyticsDashboard from './components/AnalyticsDashboard';
 
 const darkTheme = createTheme({
   palette: {
@@ -46,7 +47,7 @@ const darkTheme = createTheme({
 
 function App() {
   const [isAestheticMode, setIsAestheticMode] = useState(true);
-  const [selectedOption, setSelectedOption] = useState('selectPrompt');
+  const [selectedOption, setSelectedOption] = useState('marketIntel');
   const [marketIntelData, setMarketIntelData] = useState(null);
   const [salesStrategiesData, setSalesStrategiesData] = useState(null);
   const [selectedPromptData, setSelectedPromptData] = useState(null);
@@ -175,6 +176,12 @@ function App() {
             />
           </ContentArea>
         );
+      case 'analytics':
+        return (
+          <ContentArea>
+            <AnalyticsDashboard isAestheticMode={isAestheticMode} />
+          </ContentArea>
+        );
       default:
         return (
           <ContentArea>
@@ -194,7 +201,13 @@ function App() {
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
           <MainLayout>
             <Sidebar selectedOption={selectedOption} onOptionSelect={handleOptionSelect} />
-            <Box sx={{ display: 'flex', flex: 1, gap: '2rem' }}>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: { xs: 'column', md: 'row' }, // Stack on mobile, side-by-side on desktop
+              flex: 1, 
+              gap: '2rem',
+              overflow: 'auto' // Ensure content can scroll on small screens
+            }}>
               {renderContent()}
               <OutputPreview sections={outputSections} isAestheticMode={isAestheticMode} />
             </Box>

@@ -1,26 +1,32 @@
 import React from 'react';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, useMediaQuery, useTheme, Tooltip } from '@mui/material';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined';
 import SellOutlinedIcon from '@mui/icons-material/SellOutlined';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
 
 const Sidebar = ({ selectedOption, onOptionSelect }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
   const menuItems = [
-    {
-      id: 'pickModel',
-      label: 'Pick Model',
-      icon: <SmartToyOutlinedIcon />,
-    },
-    {
-      id: 'selectPrompt',
-      label: 'Select Prompt',
-      icon: <SmartToyOutlinedIcon />,
-    },
     {
       id: 'marketIntel',
       label: 'Market Intel',
       icon: <InsightsOutlinedIcon />,
+    },
+    {
+      id: 'selectPrompt',
+      label: 'Select Prompt',
+      icon: <AutoAwesomeIcon />, // Unique icon for prompt selection
+    },
+    {
+      id: 'pickModel',
+      label: 'Pick Model',
+      icon: <ModelTrainingIcon />, // Unique icon for model selection
     },
     {
       id: 'salesStrategies',
@@ -32,17 +38,25 @@ const Sidebar = ({ selectedOption, onOptionSelect }) => {
       label: 'Doctor-Ready Report',
       icon: <ArticleOutlinedIcon />,
     },
+    {
+      id: 'analytics',
+      label: 'Analytics',
+      icon: <BarChartIcon />,
+    },
   ];
 
   return (
     <Box
       sx={{
-        width: 240,
-        flexShrink: 0,
-        backgroundColor: 'rgba(15, 15, 25, 0.6)',
-        borderRadius: '16px',
-        overflow: 'hidden',
+        minWidth: isMobile ? '70px' : '240px', // Narrower sidebar on mobile for icon-only
+        backgroundColor: 'rgba(22, 22, 30, 0.3)', 
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
         backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)', // For Safari support
+        borderRight: '1px solid rgba(255, 255, 255, 0.05)',
+        transition: 'min-width 0.3s ease', // Smooth transition when resizing
       }}
     >
       <List sx={{ py: 2 }}>
@@ -53,7 +67,7 @@ const Sidebar = ({ selectedOption, onOptionSelect }) => {
               onClick={() => onOptionSelect(item.id)}
               sx={{
                 py: 1.5,
-                px: 3,
+                px: isMobile ? 1.5 : 3,
                 '&.Mui-selected': {
                   backgroundColor: 'rgba(138, 116, 249, 0.1)',
                   '&:hover': {
@@ -67,19 +81,31 @@ const Sidebar = ({ selectedOption, onOptionSelect }) => {
             >
               <ListItemIcon
                 sx={{
-                  minWidth: 40,
+                  minWidth: isMobile ? 36 : 40,
                   color: selectedOption === item.id ? 'primary.main' : 'rgba(255, 255, 255, 0.7)',
+                  ...(isMobile && {
+                    margin: '0 auto',
+                    justifyContent: 'center'
+                  })
                 }}
               >
-                {item.icon}
+                {isMobile ? (
+                  <Tooltip title={item.label} placement="right">
+                    {item.icon}
+                  </Tooltip>
+                ) : item.icon}
               </ListItemIcon>
-              <ListItemText
-                primary={item.label}
-                primaryTypographyProps={{
-                  fontWeight: selectedOption === item.id ? 600 : 400,
-                  color: selectedOption === item.id ? 'white' : 'rgba(255, 255, 255, 0.7)',
-                }}
-              />
+              {!isMobile && (
+                <ListItemText
+                  primary={item.label}
+                  sx={{
+                    '& .MuiListItemText-primary': {
+                      color: selectedOption === item.id ? 'primary.main' : 'white',
+                      fontWeight: selectedOption === item.id ? 600 : 400,
+                    },
+                  }}
+                />
+              )}
             </ListItemButton>
           </ListItem>
         ))}

@@ -47,27 +47,33 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
           ? 'rgba(138, 116, 249, 0.1)'
           : 'rgba(20, 20, 35, 0.6)',
         borderRadius: '16px',
-        padding: '1.5rem',
+        padding: '2rem',
+        paddingBottom: '3rem',
         color: 'white',
         width: '100%',
+        minHeight: '70vh', // Make the form taller
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       <Typography
         variant="h5"
         sx={{
           fontWeight: 600,
-          mb: 3,
+          mb: 4, // Increased vertical spacing
+          mt: 1,
           color: isAestheticMode ? 'rgba(138, 116, 249, 0.9)' : 'white',
+          fontSize: { xs: '1.5rem', md: '2rem' }, // Responsive font size
         }}
       >
         Market Intelligence
       </Typography>
 
-      <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
+      <Typography variant="body1" sx={{ mb: 4, opacity: 0.9, fontSize: '1.1rem', lineHeight: 1.6 }}>
         Complete this form to generate market insights for your target doctor and product.
       </Typography>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={4}> {/* Increased grid spacing */}
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
@@ -230,23 +236,19 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
         </Grid>
       </Grid>
 
-      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+      <Box sx={{ mt: 6, marginTop: 'auto' }}>
         <Button
           type="submit"
           variant="contained"
+          color="primary"
           disabled={!isFormValid()}
           sx={{
-            backgroundColor: isAestheticMode ? 'rgba(138, 116, 249, 0.6)' : 'primary.main',
-            color: 'white',
+            py: 1.8, // Taller button
+            px: 5,
             borderRadius: '8px',
-            padding: '10px 24px',
-            '&:hover': {
-              backgroundColor: isAestheticMode ? 'rgba(138, 116, 249, 0.8)' : 'primary.dark',
-            },
-            '&.Mui-disabled': {
-              backgroundColor: 'rgba(255, 255, 255, 0.12)',
-              color: 'rgba(255, 255, 255, 0.3)',
-            },
+            textTransform: 'none',
+            fontSize: '1.1rem',
+            fontWeight: 600,
           }}
         >
           Generate Market Intelligence
