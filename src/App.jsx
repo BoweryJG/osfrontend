@@ -9,8 +9,11 @@ import OutputPreview from './components/OutputPreview';
 import MarketIntelForm from './components/MarketIntelForm';
 import SalesStrategiesForm from './components/SalesStrategiesForm';
 import DoctorReportForm from './components/DoctorReportForm';
+import ModelPicker from './components/ModelPicker';
 import PromptSelector from './components/PromptSelector';
 import CosmicBackground from './CosmicBackground';
+import Navbar from './components/Navbar';
+import OrbContextProvider from './components/OrbContextProvider';
 
 const darkTheme = createTheme({
   palette: {
@@ -32,7 +35,7 @@ const darkTheme = createTheme({
         body: {
           margin: 0,
           padding: 0,
-          overflow: 'hidden',
+          overflow: 'auto',
           backgroundColor: '#0A0A14',
           color: '#FFFFFF',
         },
@@ -129,12 +132,7 @@ function App() {
       case 'pickModel':
         return (
           <ContentArea>
-            <Typography variant="h5" sx={{ color: 'white', mb: 2 }}>
-              Pick Model
-            </Typography>
-            <Typography variant="body1" sx={{ color: 'white' }}>
-              Model selection functionality would go here.
-            </Typography>
+            <ModelPicker isAestheticMode={isAestheticMode} />
           </ContentArea>
         );
       case 'selectPrompt':
@@ -191,26 +189,18 @@ function App() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      <CosmicBackground />
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100vh',
-          width: '100vw',
-          position: 'relative',
-          zIndex: 1,
-        }}
-      >
-        <Header isAestheticMode={isAestheticMode} toggleAestheticMode={toggleAestheticMode} />
-        <MainLayout>
-          <Sidebar selectedOption={selectedOption} onOptionSelect={handleOptionSelect} />
-          <Box sx={{ display: 'flex', flex: 1, gap: '2rem' }}>
-            {renderContent()}
-            <OutputPreview sections={outputSections} isAestheticMode={isAestheticMode} />
-          </Box>
-        </MainLayout>
-      </Box>
+      <OrbContextProvider>
+        <Navbar />
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+          <MainLayout>
+            <Sidebar selectedOption={selectedOption} onOptionSelect={handleOptionSelect} />
+            <Box sx={{ display: 'flex', flex: 1, gap: '2rem' }}>
+              {renderContent()}
+              <OutputPreview sections={outputSections} isAestheticMode={isAestheticMode} />
+            </Box>
+          </MainLayout>
+        </Box>
+      </OrbContextProvider>
     </ThemeProvider>
   );
 }

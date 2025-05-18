@@ -29,38 +29,6 @@ const Header = ({ isAestheticMode, toggleAestheticMode }) => {
         >
           repSpheres
         </Typography>
-        <Box sx={{ display: 'flex', gap: 3 }}>
-          <Button
-            sx={{
-              color: 'white',
-              textTransform: 'none',
-              fontSize: '1rem',
-              fontWeight: 500,
-              opacity: 0.9,
-              '&:hover': {
-                opacity: 1,
-                backgroundColor: 'transparent',
-              },
-            }}
-          >
-            Insights
-          </Button>
-          <Button
-            sx={{
-              color: 'white',
-              textTransform: 'none',
-              fontSize: '1rem',
-              fontWeight: 500,
-              opacity: 0.9,
-              '&:hover': {
-                opacity: 1,
-                backgroundColor: 'transparent',
-              },
-            }}
-          >
-            Linguistics
-          </Button>
-        </Box>
       </Box>
 
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
