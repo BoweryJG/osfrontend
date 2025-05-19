@@ -31,12 +31,13 @@ const ACCENT_COLOR = '#00ffc6';
 
 // Main navigation links
 const getNavLinks = (currentUrl) => {
-  const links = [
+  let links = [
     { 
       key: 'insights',
       label: 'Market Insights', 
       href: 'https://marketdata.repspheres.com/',
-      icon: <InsightsIcon fontSize="small" sx={{ color: ACCENT_COLOR }} />,      highlight: true
+      icon: <InsightsIcon fontSize="small" sx={{ color: ACCENT_COLOR }} />,
+      highlight: true
     },
     { 
       key: 'workspace',
@@ -72,7 +73,7 @@ const getNavLinks = (currentUrl) => {
   if (currentUrl.includes('/workspace')) {
     links = links.filter(link => link.key !== 'workspace');
   }
-
+  
   return links;
 };
 
@@ -484,8 +485,7 @@ export default function NavBar() {
             <IconButton
               aria-label="more options"
               aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenuOpen}
+              aria-haspopup="true"              onClick={handleMenuOpen}
               sx={{ 
                 ml: 0.5, 
                 color: '#fff',
