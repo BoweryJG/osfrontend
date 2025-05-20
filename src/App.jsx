@@ -182,7 +182,10 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <OrbContextProvider>
-        <Navbar />
+        <Navbar
+          isAestheticMode={isAestheticMode}
+          toggleAestheticMode={toggleAestheticMode}
+        />
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
           <MainLayout>
             <Sidebar selectedOption={selectedOption} onOptionSelect={handleOptionSelect} />
