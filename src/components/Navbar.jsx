@@ -85,7 +85,7 @@ const moreMenuItems = [
   { label: 'Legal', href: 'https://repspheres.com/legal' }
 ];
 
-export default function NavBar() {
+export default function NavBar({ isAestheticMode, toggleAestheticMode }) {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = React.useState(null);
   const theme = useTheme();
@@ -326,12 +326,6 @@ export default function NavBar() {
       maxWidth: '1800px',
       overflow: 'hidden', // Ensures nothing extends outside the AppBar
       zIndex: 1200,
-      backgroundColor: 'rgba(24,24,43,0.52)',
-      backdropFilter: 'blur(10px)',
-      WebkitBackdropFilter: 'blur(10px)',
-      boxShadow: '0 6px 24px 0 rgba(123,66,246,0.15)',
-      border: '1px solid rgba(123,66,246,0.13)',
-      borderBottom: '1px solid rgba(123,66,246,0.10)',
     }}>
       <Toolbar sx={{ 
         px: { xs: 1, sm: 2 },
@@ -440,7 +434,10 @@ export default function NavBar() {
             mr: 1,
             opacity: 0.8,
           }}>
-            <ThemeToggle />
+            <ThemeToggle
+              isAestheticMode={isAestheticMode}
+              toggleAestheticMode={toggleAestheticMode}
+            />
           </Box>
           
           {/* Auth Buttons - Always visible except on very small screens */}
