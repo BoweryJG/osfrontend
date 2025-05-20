@@ -7,6 +7,7 @@ import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
+import OrbLogo from './OrbLogo';
 
 const Sidebar = ({ selectedOption, onOptionSelect }) => {
   const theme = useTheme();
@@ -106,17 +107,7 @@ const Sidebar = ({ selectedOption, onOptionSelect }) => {
           fontSize: '0.75rem',
         }}
       >
-        <Box
-          component="img"
-          src="/logo-small.png"
-          alt="repSpheres Logo"
-          sx={{
-            width: 24,
-            height: 24,
-            opacity: 0.5,
-            mb: 1,
-          }}
-        />
+        <OrbLogo size={24} style={{ opacity: 0.5, marginBottom: '4px' }} />
         <Box>© 2025 repSpheres</Box>
       </Box>
     </Box>
