@@ -116,11 +116,6 @@ const OutputPreview = ({ sections = {}, isAestheticMode = false }) => {
   const exportOptions = [
     { id: 'save', label: 'Save Report', icon: <SaveIcon fontSize="small" /> },
     { id: 'email', label: 'Email Report', icon: <EmailIcon fontSize="small" /> },
-    { id: 'sphere', label: 'Send to Sphere OS', icon: null },
-    { id: 'hubspot', label: 'Send to HubSpot', icon: null },
-    { id: 'salesforce', label: 'Send to Salesforce', icon: null },
-    { id: 'doctor', label: 'Send to Doctor', icon: null },
-    { id: 'coworker', label: 'Send to CoWorker', icon: null },
   ];
 
   const handleExportOptionSelect = (option) => {
@@ -165,18 +160,6 @@ const OutputPreview = ({ sections = {}, isAestheticMode = false }) => {
         <Box sx={{ display: 'flex', gap: 2 }}>
           <Button
             variant="contained"
-            sx={{
-              backgroundColor: 'rgba(30, 30, 40, 0.6)',
-              borderRadius: '8px',
-              '&:hover': {
-                backgroundColor: 'rgba(30, 30, 40, 0.8)',
-              },
-            }}
-          >
-            Save
-          </Button>
-          <Button
-            variant="contained"
             endIcon={<KeyboardArrowDownIcon />}
             onClick={handleExportClick}
             sx={{
@@ -187,7 +170,7 @@ const OutputPreview = ({ sections = {}, isAestheticMode = false }) => {
               },
             }}
           >
-            Send to Doc
+            Export
           </Button>
           <Menu
             anchorEl={exportAnchorEl}
