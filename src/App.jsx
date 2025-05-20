@@ -6,9 +6,7 @@ import Sidebar from './components/Sidebar';
 import MainLayout from './components/MainLayout';
 import ContentArea from './components/ContentArea';
 import OutputPreview from './components/OutputPreview';
-import MarketIntelForm from './components/MarketIntelForm';
-import SalesStrategiesForm from './components/SalesStrategiesForm';
-import DoctorReportForm from './components/DoctorReportForm';
+import WorkflowStepper from './components/WorkflowStepper';
 import ModelPicker from './components/ModelPicker';
 import PromptSelector from './components/PromptSelector';
 import CosmicBackground from './CosmicBackground';
@@ -89,6 +87,9 @@ function App() {
       industryOverview: `Industry overview for medical devices similar to ${data.product} in the ${data.city} area. This section would analyze industry trends and growth projections.`,
       competitiveLandscape: `Competitive landscape analysis for ${data.product} providers in ${data.city}, ${data.state}. This section would identify key competitors and their market positioning.`,
     });
+
+    // Move to the next step in the workflow
+    setSelectedOption('salesStrategies');
   };
 
   const handleSalesStrategiesSubmit = (data) => {
@@ -146,33 +147,17 @@ function App() {
           </ContentArea>
         );
       case 'marketIntel':
-        return (
-          <ContentArea>
-            <MarketIntelForm 
-              onSubmit={handleMarketIntelSubmit} 
-              isAestheticMode={isAestheticMode} 
-            />
-          </ContentArea>
-        );
       case 'salesStrategies':
-        return (
-          <ContentArea>
-            <SalesStrategiesForm 
-              onSubmit={handleSalesStrategiesSubmit} 
-              marketIntelData={marketIntelData}
-              isAestheticMode={isAestheticMode} 
-            />
-          </ContentArea>
-        );
       case 'doctorReport':
+        const stepMap = { marketIntel: 0, salesStrategies: 1, doctorReport: 2 };
         return (
           <ContentArea>
-            <DoctorReportForm 
-              onSubmit={handleDoctorReportSubmit}
-              marketIntelData={marketIntelData}
-              salesStrategiesData={salesStrategiesData}
-              selectedPromptData={selectedPromptData}
-              isAestheticMode={isAestheticMode} 
+            <WorkflowStepper
+              initialStep={stepMap[selectedOption]}
+              onMarketIntelSubmit={handleMarketIntelSubmit}
+              onSalesStrategiesSubmit={handleSalesStrategiesSubmit}
+              onDoctorReportSubmit={handleDoctorReportSubmit}
+              isAestheticMode={isAestheticMode}
             />
           </ContentArea>
         );
