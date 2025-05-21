@@ -19,7 +19,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import MemoryIcon from '@mui/icons-material/Memory';
-import { useOrbContext } from './OrbContextProvider';
+import OrbLogo from './OrbLogo';
 import ThemeToggle from './ThemeToggle';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -85,7 +85,7 @@ const moreMenuItems = [
   { label: 'Legal', href: 'https://repspheres.com/legal' }
 ];
 
-export default function NavBar() {
+export default function NavBar({ isAestheticMode, toggleAestheticMode }) {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = React.useState(null);
   const theme = useTheme();
@@ -98,22 +98,6 @@ export default function NavBar() {
   // Get navigation links based on current page
   const navLinks = getNavLinks(currentUrl);
   
-  // Get the gradient colors from context
-  const { gradientColors } = useOrbContext();
-
-  // Orb SVG for brand logo with gradient colors
-  const orb = (
-    <svg width="100%" height="100%" viewBox="0 0 32 32" style={{ filter: 'drop-shadow(0 0 6px #7B42F6AA)' }}>
-      <defs>
-        <radialGradient id="orbGrad" cx="50%" cy="50%" r="70%">
-          <stop offset="0%" stopColor={gradientColors.start} />
-          <stop offset="100%" stopColor={gradientColors.end} />
-        </radialGradient>
-      </defs>
-      <circle cx="16" cy="16" r="14" fill="url(#orbGrad)" opacity="0.85" />
-      <circle cx="16" cy="16" r="8" fill="#fff" opacity="0.08" />
-    </svg>
-  );
   
   // Handle drawer toggle
   const toggleDrawer = (open) => (event) => {
@@ -211,12 +195,12 @@ export default function NavBar() {
         mt: 2,
         cursor: 'pointer'
       }} onClick={() => typeof window !== 'undefined' && (window.location.href = 'https://repspheres.com')}>
-        <Box sx={{ 
-          width: 32, 
-          height: 32, 
-          mr: 1.5 
+        <Box sx={{
+          width: 32,
+          height: 32,
+          mr: 1.5
         }}>
-          {orb}
+          <OrbLogo size="100%" />
         </Box>
         <Box sx={{ 
           fontSize: '1.2rem', 
@@ -326,12 +310,6 @@ export default function NavBar() {
       maxWidth: '1800px',
       overflow: 'hidden', // Ensures nothing extends outside the AppBar
       zIndex: 1200,
-      backgroundColor: 'rgba(24,24,43,0.52)',
-      backdropFilter: 'blur(10px)',
-      WebkitBackdropFilter: 'blur(10px)',
-      boxShadow: '0 6px 24px 0 rgba(123,66,246,0.15)',
-      border: '1px solid rgba(123,66,246,0.13)',
-      borderBottom: '1px solid rgba(123,66,246,0.10)',
     }}>
       <Toolbar sx={{ 
         px: { xs: 1, sm: 2 },
@@ -352,14 +330,14 @@ export default function NavBar() {
             color: 'inherit'
           }}
         >
-          <Box sx={{ 
+          <Box sx={{
             display: 'flex',
             alignItems: 'center',
             mr: 1,
             width: { xs: 28, sm: 32 },
             height: { xs: 28, sm: 32 }
           }}>
-            {orb}
+            <OrbLogo size="100%" />
           </Box>
           
           <Box sx={{ 
@@ -440,7 +418,10 @@ export default function NavBar() {
             mr: 1,
             opacity: 0.8,
           }}>
-            <ThemeToggle />
+            <ThemeToggle
+              isAestheticMode={isAestheticMode}
+              toggleAestheticMode={toggleAestheticMode}
+            />
           </Box>
           
           {/* Auth Buttons - Always visible except on very small screens */}

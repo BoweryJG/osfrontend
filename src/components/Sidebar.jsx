@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, useMediaQuery, useTheme, Tooltip } from '@mui/material';
+import { Box, List, ListItem, ListItemButton, ListItemIcon, useMediaQuery, useTheme, Tooltip } from '@mui/material';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import InsightsOutlinedIcon from '@mui/icons-material/InsightsOutlined';
 import SellOutlinedIcon from '@mui/icons-material/SellOutlined';
@@ -7,6 +7,7 @@ import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import ModelTrainingIcon from '@mui/icons-material/ModelTraining';
+import OrbLogo from './OrbLogo';
 
 const Sidebar = ({ selectedOption, onOptionSelect }) => {
   const theme = useTheme();
@@ -48,7 +49,7 @@ const Sidebar = ({ selectedOption, onOptionSelect }) => {
   return (
     <Box
       sx={{
-        minWidth: isMobile ? '70px' : '240px', // Narrower sidebar on mobile for icon-only
+        minWidth: '70px',
         backgroundColor: 'rgba(22, 22, 30, 0.3)', 
         height: '100%',
         display: 'flex',
@@ -67,7 +68,7 @@ const Sidebar = ({ selectedOption, onOptionSelect }) => {
               onClick={() => onOptionSelect(item.id)}
               sx={{
                 py: 1.5,
-                px: isMobile ? 1.5 : 3,
+                px: 1.5,
                 '&.Mui-selected': {
                   backgroundColor: 'rgba(138, 116, 249, 0.1)',
                   '&:hover': {
@@ -79,33 +80,17 @@ const Sidebar = ({ selectedOption, onOptionSelect }) => {
                 },
               }}
             >
-              <ListItemIcon
-                sx={{
-                  minWidth: isMobile ? 36 : 40,
-                  color: selectedOption === item.id ? 'primary.main' : 'rgba(255, 255, 255, 0.7)',
-                  ...(isMobile && {
-                    margin: '0 auto',
-                    justifyContent: 'center'
-                  })
-                }}
-              >
-                {isMobile ? (
-                  <Tooltip title={item.label} placement="right">
-                    {item.icon}
-                  </Tooltip>
-                ) : item.icon}
-              </ListItemIcon>
-              {!isMobile && (
-                <ListItemText
-                  primary={item.label}
+              <Tooltip title={item.label} placement="right">
+                <ListItemIcon
                   sx={{
-                    '& .MuiListItemText-primary': {
-                      color: selectedOption === item.id ? 'primary.main' : 'white',
-                      fontWeight: selectedOption === item.id ? 600 : 400,
-                    },
+                    minWidth: 36,
+                    color: selectedOption === item.id ? 'primary.main' : 'rgba(255, 255, 255, 0.7)',
+                    justifyContent: 'center',
                   }}
-                />
-              )}
+                >
+                  {item.icon}
+                </ListItemIcon>
+              </Tooltip>
             </ListItemButton>
           </ListItem>
         ))}
@@ -122,17 +107,7 @@ const Sidebar = ({ selectedOption, onOptionSelect }) => {
           fontSize: '0.75rem',
         }}
       >
-        <Box
-          component="img"
-          src="/logo-small.png"
-          alt="repSpheres Logo"
-          sx={{
-            width: 24,
-            height: 24,
-            opacity: 0.5,
-            mb: 1,
-          }}
-        />
+        <OrbLogo size={24} style={{ opacity: 0.5, marginBottom: '4px' }} />
         <Box>© 2025 repSpheres</Box>
       </Box>
     </Box>

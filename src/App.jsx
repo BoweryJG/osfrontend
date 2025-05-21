@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import { ThemeProvider, CssBaseline, Box, Typography } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
-import Header from './components/Header';
-import Sidebar from './components/Sidebar';
+import TopMenuCarousel from './components/TopMenuCarousel';
 import MainLayout from './components/MainLayout';
 import ContentArea from './components/ContentArea';
 import OutputPreview from './components/OutputPreview';
-import MarketIntelForm from './components/MarketIntelForm';
-import SalesStrategiesForm from './components/SalesStrategiesForm';
-import DoctorReportForm from './components/DoctorReportForm';
+import WorkflowStepper from './components/WorkflowStepper';
 import ModelPicker from './components/ModelPicker';
 import PromptSelector from './components/PromptSelector';
 import CosmicBackground from './CosmicBackground';
@@ -89,6 +86,9 @@ function App() {
       industryOverview: `Industry overview for medical devices similar to ${data.product} in the ${data.city} area. This section would analyze industry trends and growth projections.`,
       competitiveLandscape: `Competitive landscape analysis for ${data.product} providers in ${data.city}, ${data.state}. This section would identify key competitors and their market positioning.`,
     });
+
+    // Move to the next step in the workflow
+    setSelectedOption('salesStrategies');
   };
 
   const handleSalesStrategiesSubmit = (data) => {
@@ -146,33 +146,17 @@ function App() {
           </ContentArea>
         );
       case 'marketIntel':
-        return (
-          <ContentArea>
-            <MarketIntelForm 
-              onSubmit={handleMarketIntelSubmit} 
-              isAestheticMode={isAestheticMode} 
-            />
-          </ContentArea>
-        );
       case 'salesStrategies':
-        return (
-          <ContentArea>
-            <SalesStrategiesForm 
-              onSubmit={handleSalesStrategiesSubmit} 
-              marketIntelData={marketIntelData}
-              isAestheticMode={isAestheticMode} 
-            />
-          </ContentArea>
-        );
       case 'doctorReport':
+        const stepMap = { marketIntel: 0, salesStrategies: 1, doctorReport: 2 };
         return (
           <ContentArea>
-            <DoctorReportForm 
-              onSubmit={handleDoctorReportSubmit}
-              marketIntelData={marketIntelData}
-              salesStrategiesData={salesStrategiesData}
-              selectedPromptData={selectedPromptData}
-              isAestheticMode={isAestheticMode} 
+            <WorkflowStepper
+              initialStep={stepMap[selectedOption]}
+              onMarketIntelSubmit={handleMarketIntelSubmit}
+              onSalesStrategiesSubmit={handleSalesStrategiesSubmit}
+              onDoctorReportSubmit={handleDoctorReportSubmit}
+              isAestheticMode={isAestheticMode}
             />
           </ContentArea>
         );
@@ -186,7 +170,7 @@ function App() {
         return (
           <ContentArea>
             <Typography variant="h5" sx={{ color: 'white', mb: 2 }}>
-              Select an option from the sidebar
+              Select an option from the menu
             </Typography>
           </ContentArea>
         );
@@ -197,14 +181,17 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <OrbContextProvider>
-        <Navbar />
+        <Navbar
+          isAestheticMode={isAestheticMode}
+          toggleAestheticMode={toggleAestheticMode}
+        />
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
           <MainLayout>
-            <Sidebar selectedOption={selectedOption} onOptionSelect={handleOptionSelect} />
-            <Box sx={{ 
-              display: 'flex', 
+            <TopMenuCarousel selectedOption={selectedOption} onOptionSelect={handleOptionSelect} />
+            <Box sx={{
+              display: 'flex',
               flexDirection: { xs: 'column', md: 'row' }, // Stack on mobile, side-by-side on desktop
-              flex: 1, 
+              flex: 1,
               gap: '2rem',
               overflow: 'auto' // Ensure content can scroll on small screens
             }}>
