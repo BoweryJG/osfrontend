@@ -47,11 +47,9 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
           ? 'rgba(138, 116, 249, 0.1)'
           : 'rgba(20, 20, 35, 0.6)',
         borderRadius: '16px',
-        padding: '2rem',
-        paddingBottom: '3rem',
+        padding: '1.2rem',
         color: 'white',
         width: '100%',
-        minHeight: '70vh', // Make the form taller
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -60,20 +58,16 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
         variant="h5"
         sx={{
           fontWeight: 600,
-          mb: 4, // Increased vertical spacing
+          mb: 2,
           mt: 1,
           color: isAestheticMode ? 'rgba(138, 116, 249, 0.9)' : 'white',
-          fontSize: { xs: '1.5rem', md: '2rem' }, // Responsive font size
+          fontSize: { xs: '1.5rem', md: '2rem' },
         }}
       >
         Market Intelligence
       </Typography>
 
-      <Typography variant="body1" sx={{ mb: 4, opacity: 0.9, fontSize: '1.1rem', lineHeight: 1.6 }}>
-        Complete this form to generate market insights for your target doctor and product.
-      </Typography>
-
-      <Grid container spacing={4}> {/* Increased grid spacing */}
+      <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
           <TextField
             fullWidth
@@ -236,7 +230,7 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
         </Grid>
       </Grid>
 
-      <Box sx={{ mt: 6, marginTop: 'auto' }}>
+      <Box sx={{ mt: 3, marginTop: 'auto' }}>
         <Button
           type="submit"
           variant="contained"
