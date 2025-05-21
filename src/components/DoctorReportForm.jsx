@@ -91,7 +91,7 @@ const DoctorReportForm = ({
           ? 'rgba(138, 116, 249, 0.1)'
           : 'rgba(20, 20, 35, 0.6)',
         borderRadius: '16px',
-        padding: '1.5rem',
+        padding: '1.2rem',
         color: 'white',
         width: '100%',
       }}
@@ -100,18 +100,18 @@ const DoctorReportForm = ({
         variant="h5"
         sx={{
           fontWeight: 600,
-          mb: 3,
+          mb: 2,
           color: isAestheticMode ? 'rgba(138, 116, 249, 0.9)' : 'white',
         }}
       >
         Doctor-Ready Report
       </Typography>
 
-      <Typography variant="body1" sx={{ mb: 4, opacity: 0.9 }}>
-        Generate a comprehensive report for your doctor based on market intelligence and sales strategies.
+      <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
+        Generate a report using your previous inputs.
       </Typography>
 
-      <Box sx={{ mb: 4 }}>
+      <Box sx={{ mb: 3 }}>
         <Typography variant="h6" sx={{ mb: 2, fontWeight: 500 }}>
           Prerequisites
         </Typography>
@@ -225,7 +225,7 @@ const DoctorReportForm = ({
             backgroundColor: 'rgba(211, 47, 47, 0.1)',
             borderRadius: '12px',
             border: '1px solid rgba(211, 47, 47, 0.3)',
-            mb: 4,
+            mb: 3,
           }}
         >
           <Typography variant="body1" color="error">
@@ -241,11 +241,11 @@ const DoctorReportForm = ({
         <Paper
           elevation={0}
           sx={{
-            p: 3,
+            p: 2,
             backgroundColor: 'rgba(46, 125, 50, 0.1)',
             borderRadius: '12px',
             border: '1px solid rgba(46, 125, 50, 0.3)',
-            mb: 4,
+            mb: 3,
             maxHeight: '300px',
             overflow: 'auto',
           }}
@@ -262,7 +262,7 @@ const DoctorReportForm = ({
       {!canGenerateReport ? (
         <Box sx={{ textAlign: 'center', py: 3 }}>
           <Typography variant="body1" sx={{ mb: 2, opacity: 0.9 }}>
-            Please complete both Market Intelligence and Sales Strategies forms to generate a Doctor-Ready Report.
+            Complete previous forms to generate your report.
           </Typography>
           <Button
             variant="outlined"
@@ -289,7 +289,7 @@ const DoctorReportForm = ({
           </Button>
         </Box>
       ) : (
-        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+        <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
           <Button
             type="submit"
             variant="contained"

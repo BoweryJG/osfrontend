@@ -48,7 +48,7 @@ const SalesStrategiesForm = ({ onSubmit, marketIntelData, isAestheticMode = fals
           ? 'rgba(138, 116, 249, 0.1)'
           : 'rgba(20, 20, 35, 0.6)',
         borderRadius: '16px',
-        padding: '1.5rem',
+        padding: '1.2rem',
         color: 'white',
         width: '100%',
       }}
@@ -57,7 +57,7 @@ const SalesStrategiesForm = ({ onSubmit, marketIntelData, isAestheticMode = fals
         variant="h5"
         sx={{
           fontWeight: 600,
-          mb: 3,
+          mb: 2,
           color: isAestheticMode ? 'rgba(138, 116, 249, 0.9)' : 'white',
         }}
       >
@@ -65,9 +65,9 @@ const SalesStrategiesForm = ({ onSubmit, marketIntelData, isAestheticMode = fals
       </Typography>
 
       {!isMarketIntelCompleted ? (
-        <Box sx={{ textAlign: 'center', py: 4 }}>
+        <Box sx={{ textAlign: 'center', py: 3 }}>
           <Typography variant="body1" sx={{ mb: 2, opacity: 0.9 }}>
-            Please complete the Market Intelligence form first.
+            Complete the Market Intel form first.
           </Typography>
           <Button
             variant="outlined"
@@ -82,11 +82,11 @@ const SalesStrategiesForm = ({ onSubmit, marketIntelData, isAestheticMode = fals
         </Box>
       ) : (
         <>
-          <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
-            Based on your market intelligence, develop targeted sales strategies.
+          <Typography variant="body1" sx={{ mb: 2, opacity: 0.9 }}>
+            Develop targeted sales strategies.
           </Typography>
 
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -256,7 +256,7 @@ const SalesStrategiesForm = ({ onSubmit, marketIntelData, isAestheticMode = fals
             </Grid>
           </Grid>
 
-          <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+          <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
             <Button
               type="submit"
               variant="contained"
