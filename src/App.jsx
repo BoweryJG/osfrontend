@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { ThemeProvider, CssBaseline, Box, Typography } from '@mui/material';
 import { createTheme } from '@mui/material/styles';
-import Header from './components/Header';
-import Sidebar from './components/Sidebar';
+import TopMenuCarousel from './components/TopMenuCarousel';
 import MainLayout from './components/MainLayout';
 import ContentArea from './components/ContentArea';
 import OutputPreview from './components/OutputPreview';
@@ -171,7 +170,7 @@ function App() {
         return (
           <ContentArea>
             <Typography variant="h5" sx={{ color: 'white', mb: 2 }}>
-              Select an option from the sidebar
+              Select an option from the menu
             </Typography>
           </ContentArea>
         );
@@ -188,11 +187,11 @@ function App() {
         />
         <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
           <MainLayout>
-            <Sidebar selectedOption={selectedOption} onOptionSelect={handleOptionSelect} />
-            <Box sx={{ 
-              display: 'flex', 
+            <TopMenuCarousel selectedOption={selectedOption} onOptionSelect={handleOptionSelect} />
+            <Box sx={{
+              display: 'flex',
               flexDirection: { xs: 'column', md: 'row' }, // Stack on mobile, side-by-side on desktop
-              flex: 1, 
+              flex: 1,
               gap: '2rem',
               overflow: 'auto' // Ensure content can scroll on small screens
             }}>
