@@ -6,6 +6,7 @@ const MainLayout = ({ children }) => {
     <Box
       sx={{
         display: 'flex',
+        flexDirection: 'column',
         flex: 1,
         padding: '2rem',
         gap: '2rem',
