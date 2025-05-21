@@ -6,7 +6,7 @@ const SalesStrategiesForm = ({ onSubmit, marketIntelData, isAestheticMode = fals
     product: marketIntelData?.product || '',
     challenges: '',
     benefits: '',
-    location: marketIntelData ? `${marketIntelData.city}, ${marketIntelData.state}` : '',
+    location: marketIntelData ? `${marketIntelData.city}, ${marketIntelData.targetCloseDate}` : '',
     successDefinition: '',
   });
 

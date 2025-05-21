@@ -23,8 +23,8 @@ const DoctorReportForm = ({
 
     try {
       // Prepare the prompt content
-      let promptContent = selectedPromptData?.promptContent || 
-        `Generate a comprehensive doctor report for ${marketIntelData.doctorName} about ${marketIntelData.product} in ${marketIntelData.city}, ${marketIntelData.state}.`;
+      let promptContent = selectedPromptData?.promptContent ||
+        `Generate a comprehensive doctor report for ${marketIntelData.doctorName} about ${marketIntelData.product} in ${marketIntelData.city}, ${marketIntelData.targetCloseDate}.`;
 
       // If we don't have a selected prompt, create a default one
       if (!selectedPromptData) {
@@ -154,7 +154,7 @@ const DoctorReportForm = ({
                   />
                   <Chip
                     size="small"
-                    label={`Location: ${marketIntelData.city}, ${marketIntelData.state}`}
+                    label={`Location: ${marketIntelData.city}, ${marketIntelData.targetCloseDate}`}
                     sx={{ mr: 1, mb: 1, backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
                   />
                 </Box>

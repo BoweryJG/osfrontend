@@ -82,9 +82,9 @@ function App() {
     
     // Generate mock content for the output preview
     setOutputSections({
-      marketAnalysis: `Market analysis for ${data.product} in ${data.city}, ${data.state} over the next ${data.timeframe}. This section would contain detailed market insights tailored to Dr. ${data.doctorName}'s practice.`,
+      marketAnalysis: `Market analysis for ${data.product} in ${data.city}, ${data.targetCloseDate} over the next ${data.timeframe}. This section would contain detailed market insights tailored to Dr. ${data.doctorName}'s practice.`,
       industryOverview: `Industry overview for medical devices similar to ${data.product} in the ${data.city} area. This section would analyze industry trends and growth projections.`,
-      competitiveLandscape: `Competitive landscape analysis for ${data.product} providers in ${data.city}, ${data.state}. This section would identify key competitors and their market positioning.`,
+      competitiveLandscape: `Competitive landscape analysis for ${data.product} providers in ${data.city}, ${data.targetCloseDate}. This section would identify key competitors and their market positioning.`,
     });
 
     // Move to the next step in the workflow
