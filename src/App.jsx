@@ -62,18 +62,18 @@ function App() {
     setSelectedOption(option);
   };
 
-  // Add event listener for custom navigation events
+  // Listen for sidebar selection events dispatched from child components
   React.useEffect(() => {
-    const handleNavigate = (event) => {
+    const handleMenuSelect = (event) => {
       if (event.detail) {
         setSelectedOption(event.detail);
       }
     };
-    
-    window.addEventListener('navigate', handleNavigate);
-    
+
+    window.addEventListener('menuSelect', handleMenuSelect);
+
     return () => {
-      window.removeEventListener('navigate', handleNavigate);
+      window.removeEventListener('menuSelect', handleMenuSelect);
     };
   }, []);
 

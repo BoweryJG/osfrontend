@@ -22,8 +22,10 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
     e.preventDefault();
     if (onSubmit) {
       onSubmit(formData);
-      // Navigate to sales strategies after submitting
-      window.dispatchEvent(new CustomEvent('navigate', { detail: 'salesStrategies' }));
+      // Inform the app to switch the sidebar selection to Sales Strategies
+      window.dispatchEvent(
+        new CustomEvent('menuSelect', { detail: 'salesStrategies' })
+      );
     }
   };
 
