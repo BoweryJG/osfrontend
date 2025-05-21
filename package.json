@@ -5,8 +5,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build --legacy-peer-deps",
-    "preview": "vite preview",
-    "postinstall": "npm install --legacy-peer-deps"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
