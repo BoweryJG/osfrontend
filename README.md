@@ -9,6 +9,8 @@ A modern web application for medical sales representatives to generate AI-powere
 - **Sales Strategies**: Define sales approaches and success metrics
 - **Doctor-Ready Reports**: Generate comprehensive reports using OpenRouter API
 - **Modern UI**: Sleek, responsive interface with cosmic theme
+- **Swipeable Navigation**: Carousel-style tabs powered by `react-swipeable-views`
+- **Excel Import**: Upload `.xlsx` files to load market data
 
 ## Technical Stack
 
@@ -33,6 +35,17 @@ The application uses OpenRouter API to generate AI content based on:
 - User-provided market intelligence
 - Sales strategy information
 
+## The Hundred API Integration
+
+This feature requires a separate service called **The Hundred** which provides
+additional data for report generation. Configure the following API endpoint and
+keys in your environment variables:
+
+- `VITE_THE_HUNDRED_API_URL` - Base URL of The Hundred API
+- `VITE_THE_HUNDRED_API_KEY` - API key for authenticating requests
+- Example endpoints include `/players` for roster data and `/stats` for
+  performance statistics.
+
 ## Environment Variables
 
 The application requires the following environment variables:
@@ -40,6 +53,8 @@ The application requires the following environment variables:
 ```
 VITE_API_URL=http://localhost:3000/task
 VITE_OPENROUTER_API_KEY=your-openrouter-api-key
+VITE_THE_HUNDRED_API_URL=https://the-hundred.example.com/api
+VITE_THE_HUNDRED_API_KEY=your-the-hundred-api-key
 ```
 
 ## Getting Started
