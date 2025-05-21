@@ -278,7 +278,9 @@ const DoctorReportForm = ({
           </Button>
           <Button
             variant="outlined"
-            onClick={() => window.dispatchEvent(new CustomEvent('navigate', { detail: 'salesStrategies' }))}
+            onClick={() =>
+              window.dispatchEvent(new CustomEvent('menuSelect', { detail: 'salesStrategies' }))
+            }
             sx={{
               borderColor: isAestheticMode ? 'rgba(138, 116, 249, 0.6)' : 'primary.main',
               color: isAestheticMode ? 'rgba(138, 116, 249, 0.9)' : 'primary.main',

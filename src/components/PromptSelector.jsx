@@ -99,8 +99,10 @@ const PromptSelector = ({ onSubmit, isAestheticMode = false }) => {
       rawPrompt: selectedPromptData.prompt_content
     });
     
-    // Navigate to the next step
-    window.dispatchEvent(new CustomEvent('navigate', { detail: 'marketIntel' }));
+    // Inform the app to switch the sidebar selection to the Market Intel form
+    window.dispatchEvent(
+      new CustomEvent('menuSelect', { detail: 'marketIntel' })
+    );
   };
 
   // Helper function to extract variables from prompt content
