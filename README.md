@@ -9,6 +9,8 @@ A modern web application for medical sales representatives to generate AI-powere
 - **Sales Strategies**: Define sales approaches and success metrics
 - **Doctor-Ready Reports**: Generate comprehensive reports using OpenRouter API
 - **Modern UI**: Sleek, responsive interface with cosmic theme
+- **Swipeable Navigation**: Carousel-style tabs powered by `react-swipeable-views`
+- **Excel Import**: Upload `.xlsx` files to load market data
 
 ## Technical Stack
 
