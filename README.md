@@ -11,6 +11,9 @@ A modern web application for medical sales representatives to generate AI-powere
 - **Modern UI**: Sleek, responsive interface with cosmic theme
 - **Swipeable Navigation**: Carousel-style tabs powered by `react-swipeable-views`
 - **Excel Import**: Upload `.xlsx` files to load market data
+- **Menu Descriptions**: Clicking a menu icon now shows a short description before navigating
+- **Procedure Dropdown**: Market Intel form includes an alphabetized procedure list from Supabase
+- **Simplified Output Preview**: Shows a single expanded section for easier reading
 
 ## Technical Stack
 

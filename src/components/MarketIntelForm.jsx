@@ -1,14 +1,35 @@
-import React, { useState } from 'react';
-import { Box, TextField, Typography, Button, Paper, Grid } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import { Box, TextField, Typography, Button, Paper, Grid, MenuItem } from '@mui/material';
+import { fetchProcedures } from '../utils/supabaseClient';
 
 const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
   const [formData, setFormData] = useState({
     doctorName: '',
     city: '',
     state: '',
+    procedure: '',
     product: '',
     timeframe: '',
   });
+  const [relativeMarket, setRelativeMarket] = useState('');
+  const [procedures, setProcedures] = useState([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await fetchProcedures();
+        const sorted = (data || []).sort((a, b) => a.name.localeCompare(b.name));
+        setProcedures(sorted);
+      } catch (err) {
+        // Fallback to static procedures
+        setProcedures([
+          { id: 'default', name: 'Standard Procedure' },
+          { id: 'advanced', name: 'Advanced Procedure' },
+        ]);
+      }
+    };
+    load();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,6 +37,15 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
       ...prev,
       [name]: value,
     }));
+
+    if (name === 'product') {
+      // Mock relative market size based on product
+      setRelativeMarket('100');
+    }
+    if (name === 'city') {
+      // Reduce the market size when city is specified
+      setRelativeMarket((prev) => prev ? String(Number(prev) * 0.5) : '50');
+    }
   };
 
   const handleSubmit = (e) => {
@@ -32,6 +62,7 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
       formData.doctorName.trim() !== '' &&
       formData.city.trim() !== '' &&
       formData.state.trim() !== '' &&
+      formData.procedure.trim() !== '' &&
       formData.product.trim() !== '' &&
       formData.timeframe.trim() !== ''
     );
@@ -52,6 +83,7 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
+        minHeight: 400,
       }}
     >
       <Typography
@@ -101,6 +133,43 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
           />
         </Grid>
         <Grid item xs={12} md={6}>
+          <TextField
+            fullWidth
+            select
+            label="Procedure"
+            name="procedure"
+            value={formData.procedure}
+            onChange={handleChange}
+            required
+            variant="outlined"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: 'rgba(30, 30, 40, 0.4)',
+                borderRadius: '8px',
+                '& fieldset': {
+                  borderColor: 'rgba(255, 255, 255, 0.2)',
+                },
+                '&:hover fieldset': {
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: isAestheticMode ? 'rgba(138, 116, 249, 0.6)' : 'primary.main',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: 'rgba(255, 255, 255, 0.7)',
+              },
+              '& .MuiInputBase-input': {
+                color: 'white',
+              },
+            }}
+          >
+            {procedures.map((p) => (
+              <MenuItem key={p.id} value={p.name}>{p.name}</MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+        <Grid item xs={12} md={4}>
           <TextField
             fullWidth
             label="Product"
@@ -167,7 +236,33 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
         <Grid item xs={12} md={4}>
           <TextField
             fullWidth
-            label="State"
+            label="Relative Market Size"
+            name="relativeMarket"
+            value={relativeMarket}
+            InputProps={{ readOnly: true }}
+            variant="outlined"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: 'rgba(30, 30, 40, 0.4)',
+                borderRadius: '8px',
+                '& fieldset': {
+                  borderColor: 'rgba(255, 255, 255, 0.2)',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: 'rgba(255, 255, 255, 0.7)',
+              },
+              '& .MuiInputBase-input': {
+                color: 'white',
+              },
+            }}
+          />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <TextField
+            fullWidth
+            label="Target Close Date"
+            type="date"
             name="state"
             value={formData.state}
             onChange={handleChange}

@@ -327,8 +327,7 @@ const OutputPreview = ({ sections = {}, isAestheticMode = false }) => {
         </Box>
       </Box>
 
-      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
-        {/* Market Analysis Section */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
         <Paper
           elevation={0}
           sx={{
@@ -338,8 +337,7 @@ const OutputPreview = ({ sections = {}, isAestheticMode = false }) => {
             borderRadius: '16px',
             padding: '1.5rem',
             color: 'white',
-            flex: { md: 1 },
-            minWidth: { md: 0 },
+            minHeight: 400,
           }}
         >
           <Typography
@@ -355,66 +353,6 @@ const OutputPreview = ({ sections = {}, isAestheticMode = false }) => {
           <Typography variant="body1" sx={{ opacity: 0.9 }}>
             {sections.marketAnalysis ||
               'Complete the Market Intel form to generate market analysis content.'}
-          </Typography>
-        </Paper>
-
-        {/* Industry Overview Section */}
-        <Paper
-          elevation={0}
-          sx={{
-            backgroundColor: isAestheticMode
-              ? 'rgba(138, 116, 249, 0.1)'
-              : 'rgba(20, 20, 35, 0.6)',
-            borderRadius: '16px',
-            padding: '1.5rem',
-            color: 'white',
-            flex: { md: 1 },
-            minWidth: { md: 0 },
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 600,
-              mb: 2,
-              color: isAestheticMode ? 'rgba(138, 116, 249, 0.9)' : 'white',
-            }}
-          >
-            Industry Overview
-          </Typography>
-          <Typography variant="body1" sx={{ opacity: 0.9 }}>
-            {sections.industryOverview ||
-              'Complete the Market Intel form to generate industry overview content.'}
-          </Typography>
-        </Paper>
-
-        {/* Competitive Landscape Section */}
-        <Paper
-          elevation={0}
-          sx={{
-            backgroundColor: isAestheticMode
-              ? 'rgba(138, 116, 249, 0.1)'
-              : 'rgba(20, 20, 35, 0.6)',
-            borderRadius: '16px',
-            padding: '1.5rem',
-            color: 'white',
-            flex: { md: 1 },
-            minWidth: { md: 0 },
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: 600,
-              mb: 2,
-              color: isAestheticMode ? 'rgba(138, 116, 249, 0.9)' : 'white',
-            }}
-          >
-            Competitive Landscape
-          </Typography>
-          <Typography variant="body1" sx={{ opacity: 0.9 }}>
-            {sections.competitiveLandscape ||
-              'Complete the Market Intel form to generate competitive landscape content.'}
           </Typography>
         </Paper>
       </Box>

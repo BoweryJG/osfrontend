@@ -124,9 +124,34 @@ export const updatePromptEffectiveness = async (id, score) => {
   }
 };
 
+/**
+ * Fetch list of procedures from Supabase
+ * @returns {Promise<Array>} Array of procedures
+ */
+export const fetchProcedures = async () => {
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/procedures`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error fetching procedures: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching procedures:', error);
+    throw error;
+  }
+};
+
 export default {
   fetchPrompts,
   fetchPromptById,
   incrementPromptUsage,
-  updatePromptEffectiveness
+  updatePromptEffectiveness,
+  fetchProcedures
 };
