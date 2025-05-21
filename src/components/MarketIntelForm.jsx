@@ -5,7 +5,7 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
   const [formData, setFormData] = useState({
     doctorName: '',
     city: '',
-    state: '',
+    targetCloseDate: '',
     product: '',
     timeframe: '',
   });
@@ -31,7 +31,7 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
     return (
       formData.doctorName.trim() !== '' &&
       formData.city.trim() !== '' &&
-      formData.state.trim() !== '' &&
+      formData.targetCloseDate.trim() !== '' &&
       formData.product.trim() !== '' &&
       formData.timeframe.trim() !== ''
     );
@@ -167,9 +167,9 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
         <Grid item xs={12} md={4}>
           <TextField
             fullWidth
-            label="State"
-            name="state"
-            value={formData.state}
+            label="Target Close Date"
+            name="targetCloseDate"
+            value={formData.targetCloseDate}
             onChange={handleChange}
             required
             variant="outlined"
