@@ -52,6 +52,8 @@ The application requires the following environment variables:
 
 ```
 VITE_API_URL=http://localhost:3000/task
+# For production deployments, use your Render URL instead:
+# VITE_API_URL=https://pedrobackend.onrender.com/task
 VITE_OPENROUTER_API_KEY=your-openrouter-api-key
 VITE_THE_HUNDRED_API_URL=https://the-hundred.example.com/api
 VITE_THE_HUNDRED_API_KEY=your-the-hundred-api-key
