@@ -123,7 +123,7 @@ Body: ${JSON.stringify(responseJson, null, 2) || responseText}`;
         // Test buttons
         document.getElementById('testRender').addEventListener('click', () => {
             testEndpoint(
-                'https://osbackend-zl1h.onrender.com/health',
+                'https://pedrobackend.onrender.com/health',
                 document.getElementById('renderStatus'),
                 document.getElementById('renderResponse')
             );
@@ -140,7 +140,7 @@ Body: ${JSON.stringify(responseJson, null, 2) || responseText}`;
         // Test task endpoints
         document.getElementById('testRender').addEventListener('dblclick', () => {
             testEndpoint(
-                'https://osbackend-zl1h.onrender.com/task',
+                'https://pedrobackend.onrender.com/task',
                 document.getElementById('renderStatus'),
                 document.getElementById('renderResponse')
             );
@@ -158,7 +158,7 @@ Body: ${JSON.stringify(responseJson, null, 2) || responseText}`;
         window.addEventListener('load', () => {
             // Auto-test the Render backend
             testEndpoint(
-                'https://osbackend-zl1h.onrender.com/health',
+                'https://pedrobackend.onrender.com/health',
                 document.getElementById('renderStatus'),
                 document.getElementById('renderResponse')
             );

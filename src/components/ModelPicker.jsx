@@ -12,8 +12,8 @@ const ModelPicker = ({ isAestheticMode }) => {
       console.log('ModelPicker: Initiating fetchModels...');
       try {
         // Replace with your actual backend endpoint if different
-        console.log('ModelPicker: Fetching from https://osbackend-zl1h.onrender.com/api/models');
-        const response = await fetch('https://osbackend-zl1h.onrender.com/api/models');
+        console.log('ModelPicker: Fetching from https://pedrobackend.onrender.com/api/models');
+        const response = await fetch('https://pedrobackend.onrender.com/api/models');
         console.log('ModelPicker: Response received, status:', response.status);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
