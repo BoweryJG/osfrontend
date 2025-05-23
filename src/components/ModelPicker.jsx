@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, List, ListItem, ListItemText, CircularProgress, Alert, Paper } from '@mui/material';
+// Removed: import { getAvailableModels } from '../utils/openRouterClient';
 
 const ModelPicker = ({ isAestheticMode }) => {
   const [models, setModels] = useState([]);
@@ -9,23 +10,32 @@ const ModelPicker = ({ isAestheticMode }) => {
 
   useEffect(() => {
     const fetchModels = async () => {
-      console.log('ModelPicker: Initiating fetchModels...');
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const modelsEndpoint = `${apiUrl}/api/models`;
+      console.log(`ModelPicker: Initiating fetchModels from ${modelsEndpoint}`);
       try {
-        // Replace with your actual backend endpoint if different
-        console.log('ModelPicker: Fetching from https://pedrobackend.onrender.com/api/models');
-        const response = await fetch('https://pedrobackend.onrender.com/api/models');
+        const response = await fetch(modelsEndpoint);
         console.log('ModelPicker: Response received, status:', response.status);
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          // Try to parse error response if possible
+          let errorBody = 'No additional error information from server.';
+          try {
+            const errData = await response.json();
+            errorBody = errData.message || errData.error || JSON.stringify(errData);
+          } catch (parseError) {
+            // If response is not JSON, use statusText
+            errorBody = response.statusText;
+          }
+          throw new Error(`HTTP error! status: ${response.status} - ${errorBody}`);
         }
         const data = await response.json();
         console.log('ModelPicker: Data parsed from JSON:', data);
-        // Add check to ensure data is an array
-        if (Array.isArray(data)) {
+        
+        if (Array.isArray(data)) { // Assuming your backend returns the array directly, or adjust if it's nested e.g. data.data
           if (data.length > 0) {
             console.log('ModelPicker: First model object:', JSON.stringify(data[0], null, 2));
           }
-          setModels(data); // Assuming the data is an array of model objects
+          setModels(data);
 
           // Attempt to set default model (e.g., GPT-3.5 Turbo)
           const defaultModel = data.find(
@@ -39,13 +49,12 @@ const ModelPicker = ({ isAestheticMode }) => {
             console.log('Default model GPT-3.5 Turbo not found.');
           }
         } else {
-          console.error('Expected an array of models, but received:', data);
-          throw new Error('Invalid data format received from server.');
+          console.error(`Expected an array of models from ${modelsEndpoint}, but received:`, data);
+          throw new Error(`Invalid data format received from ${modelsEndpoint}.`);
         }
       } catch (e) {
-        console.error('ModelPicker: Error in fetchModels:', e);
+        console.error(`ModelPicker: Error in fetchModels from ${modelsEndpoint}:`, e);
         setError(e.message);
-        console.error('Failed to fetch models:', e); // Kept original log too for consistency
       }
       setLoading(false);
     };
