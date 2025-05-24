@@ -8,7 +8,7 @@ import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import BarChartIcon from '@mui/icons-material/BarChart';
 
 const menuItems = [
-  { id: 'marketIntel', label: 'Market Intel', icon: <InsightsOutlinedIcon /> },
+  { id: 'marketIntel', label: 'Prospect Intelligence', icon: <InsightsOutlinedIcon /> },
   { id: 'selectPrompt', label: 'Select Prompt', icon: <AutoAwesomeIcon /> },
   { id: 'pickModel', label: 'Pick Model', icon: <ModelTrainingIcon /> },
   { id: 'salesStrategies', label: 'Sales Strategies', icon: <SellOutlinedIcon /> },

@@ -4,7 +4,6 @@ import { createTheme } from '@mui/material/styles';
 import TopMenuCarousel from './components/TopMenuCarousel';
 import MainLayout from './components/MainLayout';
 import ContentArea from './components/ContentArea';
-import OutputPreview from './components/OutputPreview';
 import WorkflowStepper from './components/WorkflowStepper';
 import ModelPicker from './components/ModelPicker';
 import PromptSelector from './components/PromptSelector';
@@ -48,11 +47,6 @@ function App() {
   const [marketIntelData, setMarketIntelData] = useState(null);
   const [salesStrategiesData, setSalesStrategiesData] = useState(null);
   const [selectedPromptData, setSelectedPromptData] = useState(null);
-  const [outputSections, setOutputSections] = useState({
-    marketAnalysis: '',
-    industryOverview: '',
-    competitiveLandscape: '',
-  });
 
   const toggleAestheticMode = () => {
     setIsAestheticMode(!isAestheticMode);
@@ -79,13 +73,6 @@ function App() {
 
   const handleMarketIntelSubmit = (data) => {
     setMarketIntelData(data);
-    
-    // Generate mock content for the output preview
-    setOutputSections({
-      marketAnalysis: `Market analysis for ${data.product} in ${data.city}, ${data.targetCloseDate} over the next ${data.timeframe}. This section would contain detailed market insights tailored to Dr. ${data.doctorName}'s practice.`,
-      industryOverview: `Industry overview for medical devices similar to ${data.product} in the ${data.city} area. This section would analyze industry trends and growth projections.`,
-      competitiveLandscape: `Competitive landscape analysis for ${data.product} providers in ${data.city}, ${data.targetCloseDate}. This section would identify key competitors and their market positioning.`,
-    });
 
     // Move to the next step in the workflow
     setSelectedOption('salesStrategies');
@@ -93,14 +80,7 @@ function App() {
 
   const handleSalesStrategiesSubmit = (data) => {
     setSalesStrategiesData(data);
-    
-    // Update the output preview with sales strategies content
-    setOutputSections(prev => ({
-      ...prev,
-      marketAnalysis: prev.marketAnalysis + `\n\nKey challenges identified: ${data.challenges}`,
-      competitiveLandscape: prev.competitiveLandscape + `\n\nProduct benefits to highlight: ${data.benefits}`,
-    }));
-    
+
     // Navigate to the doctor report section after submitting sales strategies
     setSelectedOption('doctorReport');
   };
@@ -108,16 +88,6 @@ function App() {
   const handleDoctorReportSubmit = (data) => {
     // Log the generated report data
     console.log('Doctor report generated:', data);
-    
-    // Update the output sections with the generated report
-    if (data.generatedReport) {
-      setOutputSections(prev => ({
-        ...prev,
-        marketAnalysis: data.generatedReport.substring(0, 500) + '...',
-        industryOverview: 'Generated using ' + (data.promptData?.promptName || 'default prompt'),
-        competitiveLandscape: 'Model used: ' + (data.promptData?.model || 'gpt-4o'),
-      }));
-    }
     
     // Show a success message
     alert(`Doctor-Ready Report generated for Dr. ${data.marketIntelData.doctorName} on ${data.marketIntelData.product}`);
@@ -196,7 +166,6 @@ function App() {
               overflow: 'auto' // Ensure content can scroll on small screens
             }}>
               {renderContent()}
-              <OutputPreview sections={outputSections} isAestheticMode={isAestheticMode} />
             </Box>
           </MainLayout>
         </Box>

@@ -66,7 +66,7 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
           fontSize: { xs: '1.5rem', md: '2rem' },
         }}
       >
-        Market Intelligence
+        Prospect Intelligence
       </Typography>
 
       <Grid container spacing={2}>
@@ -247,7 +247,7 @@ const MarketIntelForm = ({ onSubmit, isAestheticMode = false }) => {
             fontWeight: 600,
           }}
         >
-          Generate Market Intelligence
+          Generate Prospect Intelligence
         </Button>
       </Box>
     </Paper>

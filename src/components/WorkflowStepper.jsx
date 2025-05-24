@@ -4,7 +4,7 @@ import MarketIntelForm from './MarketIntelForm';
 import SalesStrategiesForm from './SalesStrategiesForm';
 import DoctorReportForm from './DoctorReportForm';
 
-const steps = ['Market Intel', 'Sales Strategies', 'Doctor Report'];
+const steps = ['Prospect Intelligence', 'Sales Strategies', 'Doctor Report'];
 
 const WorkflowStepper = ({
   isAestheticMode = false,

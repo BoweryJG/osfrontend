@@ -99,7 +99,7 @@ const PromptSelector = ({ onSubmit, isAestheticMode = false }) => {
       rawPrompt: selectedPromptData.prompt_content
     });
     
-    // Inform the app to switch the sidebar selection to the Market Intel form
+    // Inform the app to switch the sidebar selection to the Prospect Intelligence form
     window.dispatchEvent(
       new CustomEvent('menuSelect', { detail: 'marketIntel' })
     );
