@@ -16,7 +16,7 @@ const Sidebar = ({ selectedOption, onOptionSelect }) => {
   const menuItems = [
     {
       id: 'marketIntel',
-      label: 'Market Intel',
+      label: 'Prospect Intelligence',
       icon: <InsightsOutlinedIcon />,
     },
     {

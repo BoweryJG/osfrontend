@@ -137,7 +137,7 @@ const DoctorReportForm = ({
                   <ErrorOutlineIcon color="error" />
                 )}
                 <Typography variant="subtitle1" fontWeight={500}>
-                  Market Intelligence
+                  Prospect Intelligence
                 </Typography>
               </Box>
               {isMarketIntelCompleted ? (
@@ -160,7 +160,7 @@ const DoctorReportForm = ({
                 </Box>
               ) : (
                 <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                  Please complete the Market Intelligence form first.
+                  Please complete the Prospect Intelligence form first.
                 </Typography>
               )}
             </Paper>
@@ -274,7 +274,7 @@ const DoctorReportForm = ({
             }}
             disabled={isMarketIntelCompleted}
           >
-            Go to Market Intelligence
+            Go to Prospect Intelligence
           </Button>
           <Button
             variant="outlined"

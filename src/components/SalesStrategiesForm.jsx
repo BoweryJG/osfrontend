@@ -35,7 +35,7 @@ const SalesStrategiesForm = ({ onSubmit, marketIntelData, isAestheticMode = fals
     );
   };
 
-  // Check if Market Intel has been completed
+  // Check if Prospect Intel has been completed
   const isMarketIntelCompleted = !!marketIntelData;
 
   return (
@@ -67,7 +67,7 @@ const SalesStrategiesForm = ({ onSubmit, marketIntelData, isAestheticMode = fals
       {!isMarketIntelCompleted ? (
         <Box sx={{ textAlign: 'center', py: 3 }}>
           <Typography variant="body1" sx={{ mb: 2, opacity: 0.9 }}>
-            Complete the Market Intel form first.
+            Complete the Prospect Intel form first.
           </Typography>
           <Button
             variant="outlined"
@@ -77,7 +77,7 @@ const SalesStrategiesForm = ({ onSubmit, marketIntelData, isAestheticMode = fals
               color: isAestheticMode ? 'rgba(138, 116, 249, 0.9)' : 'primary.main',
             }}
           >
-            Go to Market Intelligence
+            Go to Prospect Intelligence
           </Button>
         </Box>
       ) : (

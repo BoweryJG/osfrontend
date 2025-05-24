@@ -5,7 +5,7 @@ A modern web application for medical sales representatives to generate AI-powere
 ## Features
 
 - **AI Prompt Selection**: Choose from a variety of pre-defined prompts stored in Supabase
-- **Market Intelligence**: Input market data about doctors and products
+- **Prospect Intelligence**: Input market data about doctors and products
 - **Sales Strategies**: Define sales approaches and success metrics
 - **Doctor-Ready Reports**: Generate comprehensive reports using OpenRouter API
 - **Modern UI**: Sleek, responsive interface with cosmic theme
@@ -32,7 +32,7 @@ The application connects to a Supabase database to fetch and manage AI prompts. 
 The application uses OpenRouter API to generate AI content based on:
 
 - Selected prompt template
-- User-provided market intelligence
+- User-provided prospect intelligence
 - Sales strategy information
 
 ## The Hundred API Integration
@@ -76,15 +76,14 @@ VITE_THE_HUNDRED_API_KEY=your-the-hundred-api-key
 ## Key Components
 
 - **PromptSelector**: Interface for selecting AI prompts from Supabase
-- **MarketIntelForm**: Form for inputting market intelligence data
+- **MarketIntelForm**: Form for inputting prospect intelligence data
 - **SalesStrategiesForm**: Form for defining sales strategies
 - **DoctorReportForm**: Form for generating the final doctor report
-- **OutputPreview**: Preview panel showing generated content
 
 ## Workflow
 
 1. User selects an AI prompt template
-2. User fills out the Market Intelligence form
+2. User fills out the Prospect Intelligence form
 3. User completes the Sales Strategies form
 4. User generates a Doctor-Ready Report using OpenRouter API
 5. The report is displayed and can be copied or saved
